@@ -72,3 +72,4 @@ interface IERC999 {
      * Emits a {Release} event.
      */
     function release(address owner, uint amount) external returns (bool);
+}
