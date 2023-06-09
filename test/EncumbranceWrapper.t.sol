@@ -41,7 +41,7 @@ contract EncumbranceWrapperTest is Test {
         // freeBalanceOf is 0 by default
         assertEq(wrappedToken.freeBalanceOf(alice), 0);
 
-        // reflects balance when there are no encumrbances
+        // reflects balance when there are no encumbrances
         deal(address(wrappedToken), alice, 100e18);
         assertEq(wrappedToken.balanceOf(alice), 100e18);
         assertEq(wrappedToken.freeBalanceOf(alice), 100e18);
