@@ -29,7 +29,7 @@ contract EncumbranceWrapper is ERC20, IERC999 {
      * @param _underlyingToken Address of the underlying token to wrap
      **/
     constructor(address _underlyingToken) ERC20(
-        string.concat("encumbered ", IERC20Metadata(_underlyingToken).name()),
+        string.concat("Encumberable ", IERC20Metadata(_underlyingToken).name()),
         string.concat("e", IERC20Metadata(_underlyingToken).symbol())
     ) {
         _decimals = IERC20Metadata(_underlyingToken).decimals();

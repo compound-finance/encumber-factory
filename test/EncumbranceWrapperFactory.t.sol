@@ -18,7 +18,7 @@ contract EncumbranceWrapperFactoryTest is Test {
     }
 
     function testWrappedName() public {
-        assertEq(IERC20Metadata(wrappedTestToken).name(), "encumbered TEST TOKEN");
+        assertEq(IERC20Metadata(wrappedTestToken).name(), "Encumberable TEST TOKEN");
     }
 
     function testWrappedSymbol() public {
