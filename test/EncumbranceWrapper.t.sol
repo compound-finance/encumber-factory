@@ -23,7 +23,7 @@ contract EncumbranceWrapperTest is Test {
     }
 
     function testWrappedName() public {
-        assertEq(wrappedToken.name(), "encumbered TEST TOKEN");
+        assertEq(wrappedToken.name(), "Encumberable TEST TOKEN");
     }
 
     function testWrappedSymbol() public {
