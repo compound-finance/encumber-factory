@@ -12,8 +12,7 @@ interface IERC999 {
     event Encumber(address indexed owner, address indexed taker, uint amount);
 
     /**
-     * @dev Emitted when the encumbrance of a `taker` to an `owner` is reduced
-     * by `amount`.
+     * @dev Emitted when `amount` tokens are released from `owner` by `taker`.
      */
     event Release(address indexed owner, address indexed taker, uint amount);
 
