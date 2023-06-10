@@ -35,7 +35,7 @@ import "./Context.sol";
  * allowances. See {IERC20-approve}.
  */
 contract ERC20 is Context, IERC20, IERC20Metadata {
-    mapping(address => uint256) private _balances;
+    mapping(address => uint256) internal _balances;
 
     mapping(address => mapping(address => uint256)) private _allowances;
 
@@ -230,7 +230,7 @@ contract ERC20 is Context, IERC20, IERC20Metadata {
         if (from == address(0)) {
             _totalSupply += amount;
         } else {
-            uint256 fromBalance = _balances[from];
+            uint256 fromBalance = balanceOf(from);
             require(fromBalance >= amount, "ERC20: transfer amount exceeds balance");
             unchecked {
                 // Overflow not possible: amount <= fromBalance <= totalSupply.

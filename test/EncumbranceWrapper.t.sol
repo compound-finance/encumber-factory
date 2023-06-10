@@ -2,7 +2,6 @@ pragma solidity ^0.8.15;
 
 import "forge-std/Test.sol";
 import "forge-std/StdUtils.sol";
-import "../src/erc20/IERC20Metadata.sol";
 import "../src/EncumbranceWrapper.sol";
 import "../src/erc20/ERC20.sol";
 
@@ -42,7 +41,9 @@ contract EncumbranceWrapperTest is Test {
         assertEq(wrappedToken.freeBalanceOf(alice), 0);
 
         // reflects balance when there are no encumbrances
-        deal(address(wrappedToken), alice, 100e18);
+        deal(address(erc20), alice, 100e18);
+        erc20.approve(address(wrappedToken), type(uint256).max);
+        wrappedToken.mint(alice, 100e18);
         assertEq(wrappedToken.balanceOf(alice), 100e18);
         assertEq(wrappedToken.freeBalanceOf(alice), 100e18);
 
@@ -77,8 +78,10 @@ contract EncumbranceWrapperTest is Test {
     }
 
     function testTransferRevertInsufficentBalance() public {
-        deal(address(wrappedToken), alice, 100e18);
+        deal(address(erc20), alice, 100e18);
         vm.startPrank(alice);
+        erc20.approve(address(wrappedToken), type(uint256).max);
+        wrappedToken.mint(alice, 100e18);
 
         // alice encumbers half her balance to bob
         wrappedToken.encumber(bob, 50e18);
@@ -91,8 +94,10 @@ contract EncumbranceWrapperTest is Test {
     }
 
     function testEncumberRevert() public {
-        deal(address(wrappedToken), alice, 100e18);
+        deal(address(erc20), alice, 100e18);
         vm.startPrank(alice);
+        erc20.approve(address(wrappedToken), type(uint256).max);
+        wrappedToken.mint(alice, 100e18);
 
         // alice encumbers half her balance to bob
         wrappedToken.encumber(bob, 50e18);
@@ -105,8 +110,10 @@ contract EncumbranceWrapperTest is Test {
     }
 
     function testEncumber() public {
-        deal(address(wrappedToken), alice, 100e18);
+        deal(address(erc20), alice, 100e18);
         vm.startPrank(alice);
+        erc20.approve(address(wrappedToken), type(uint256).max);
+        wrappedToken.mint(alice, 100e18);
 
         // emits Encumber event
         vm.expectEmit(true, true, true, true);
@@ -128,8 +135,11 @@ contract EncumbranceWrapperTest is Test {
     }
 
     function testTransferFromSufficientEncumbrance() public {
-        deal(address(wrappedToken), alice, 100e18);
-        vm.prank(alice);
+        deal(address(erc20), alice, 100e18);
+        vm.startPrank(alice);
+
+        erc20.approve(address(wrappedToken), type(uint256).max);
+        wrappedToken.mint(alice, 100e18);
 
         // alice encumbers some of her balance to bob
         wrappedToken.encumber(bob, 60e18);
@@ -139,6 +149,8 @@ contract EncumbranceWrapperTest is Test {
         assertEq(wrappedToken.encumberedBalance(alice), 60e18);
         assertEq(wrappedToken.encumbrances(alice, bob), 60e18);
         assertEq(wrappedToken.balanceOf(charlie), 0);
+
+        vm.stopPrank();
 
         // bob calls transfers from alice to charlie
         vm.prank(bob);
@@ -155,8 +167,11 @@ contract EncumbranceWrapperTest is Test {
     }
 
     function testTransferFromEncumbranceAndAllowance() public {
-        deal(address(wrappedToken), alice, 100e18);
+        deal(address(erc20), alice, 100e18);
         vm.startPrank(alice);
+
+        erc20.approve(address(wrappedToken), type(uint256).max);
+        wrappedToken.mint(alice, 100e18);
 
         // alice encumbers some of her balance to bob
         wrappedToken.encumber(bob, 20e18);
@@ -193,9 +208,11 @@ contract EncumbranceWrapperTest is Test {
     }
 
     function testTransferFromInsufficientAllowance() public {
-        deal(address(wrappedToken), alice, 100e18);
+        deal(address(erc20), alice, 100e18);
 
         vm.startPrank(alice);
+        erc20.approve(address(wrappedToken), type(uint256).max);
+        wrappedToken.mint(alice, 100e18);
 
         // alice encumbers some of her balance to bob
         wrappedToken.encumber(bob, 10e18);
@@ -219,11 +236,15 @@ contract EncumbranceWrapperTest is Test {
     }
 
     function testEncumberFromInsufficientAllowance() public {
-        deal(address(wrappedToken), alice, 100e18);
+        deal(address(erc20), alice, 100e18);
+        vm.startPrank(alice);
+        erc20.approve(address(wrappedToken), type(uint256).max);
+        wrappedToken.mint(alice, 100e18);
 
         // alice grants bob an approval
-        vm.prank(alice);
         wrappedToken.approve(bob, 50e18);
+
+        vm.stopPrank();
 
         // but bob tries to encumber more than his allowance
         vm.prank(bob);
@@ -232,11 +253,15 @@ contract EncumbranceWrapperTest is Test {
     }
 
     function testEncumberFrom() public {
-        deal(address(wrappedToken), alice, 100e18);
+        deal(address(erc20), alice, 100e18);
+        vm.startPrank(alice);
+        erc20.approve(address(wrappedToken), type(uint256).max);
+        wrappedToken.mint(alice, 100e18);
 
         // alice grants bob an approval
-        vm.prank(alice);
         wrappedToken.approve(bob, 100e18);
+
+        vm.stopPrank();
 
         assertEq(wrappedToken.balanceOf(alice), 100e18);
         assertEq(wrappedToken.freeBalanceOf(alice), 100e18);
@@ -266,12 +291,16 @@ contract EncumbranceWrapperTest is Test {
     }
 
     function testRelease() public {
-        deal(address(wrappedToken), alice, 100e18);
+        deal(address(erc20), alice, 100e18);
 
-        vm.prank(alice);
+        vm.startPrank(alice);
+        erc20.approve(address(wrappedToken), type(uint256).max);
+        wrappedToken.mint(alice, 100e18);
 
         // alice encumbers some of her balance to bob
         wrappedToken.encumber(bob, 100e18);
+
+        vm.stopPrank();
 
         assertEq(wrappedToken.balanceOf(alice), 100e18);
         assertEq(wrappedToken.freeBalanceOf(alice), 0);

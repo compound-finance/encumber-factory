@@ -24,6 +24,16 @@ contract EncumbranceWrapper is ERC20, IERC999 {
     /// @notice Amount encumbered from owner to taker (owner => taker => balance)
     mapping (address => mapping (address => uint)) public encumbrances;
 
+    /// @notice Index to apply when storing or returning principal balances
+    uint256 private idx = 1e15;
+
+    // @notice The scale for factors
+    uint256 constant private FACTOR_SCALE = 1e15;
+
+    /// @notice This contract's balance of the underlying token, when last
+    /// checked
+    uint256 private lastUnderlyingBalance;
+
     /**
      * @notice Construct a new wrapper instance
      * @param _underlyingToken Address of the underlying token to wrap
@@ -37,10 +47,32 @@ contract EncumbranceWrapper is ERC20, IERC999 {
     }
 
     /**
+     * @notice Total supply of the token
+     * @dev is a reflection not of the number of wrapped tokens that have been
+     * minted, but of the number of underlying token that those wrapped tokens
+     * can be redeemed for
+     */
+    function totalSupply() public view virtual override returns (uint256) {
+        return ERC20(underlyingToken).balanceOf(address(this));
+    }
+
+    /**
      * @notice Number of decimals used for the user represenation of the token
      */
     function decimals() public override view returns (uint8) {
         return _decimals;
+    }
+
+    /**
+     * @notice Returns the amount of tokens owned by `owner`.
+     * @dev internal balance is used to determine the portion of the underlying
+     * balance that belongs to `owner`
+     */
+    function balanceOf(address owner) public view override returns (uint256) {
+        if (lastUnderlyingBalance == 0) {
+            return 0;
+        }
+        return super.balanceOf(owner) * idx * ERC20(underlyingToken).balanceOf(address(this)) / FACTOR_SCALE / lastUnderlyingBalance;
     }
 
     /**
@@ -98,6 +130,24 @@ contract EncumbranceWrapper is ERC20, IERC999 {
 
         _transfer(src, dst, amount);
         return true;
+    }
+
+    /**
+     * @notice Transfers `amount` of tokens from `from` to `to`
+     */
+    function _update(address from, address to, uint256 amount) internal override {
+        uint256 principalAmount = amount * FACTOR_SCALE / idx;
+        if (from != address(0)) {
+            uint256 fromBalance = _balances[from];
+            require(fromBalance >= principalAmount, "ERC20: transfer amount exceeds balance");
+            _balances[from] = fromBalance - principalAmount;
+        }
+
+        if (to != address(0)) {
+            _balances[to] += principalAmount;
+        }
+
+        emit Transfer(from, to, amount);
     }
 
     /**
@@ -184,9 +234,24 @@ contract EncumbranceWrapper is ERC20, IERC999 {
      * @return bool Whether the operation was successful
      */
     function mint(address recipient, uint amount) external returns (bool) {
-        _mint(recipient, amount);
+        accrue();
+
         IERC20(underlyingToken).transferFrom(msg.sender, address(this), amount);
+
+        // or just update it to be the underlyingToken.balanceOf(address(this));
+        lastUnderlyingBalance += amount;
+
+        _mint(recipient, amount);
         return true;
+    }
+
+    function accrue() internal {
+        uint currentBalance = ERC20(underlyingToken).balanceOf(address(this));
+        uint diff = currentBalance - lastUnderlyingBalance;
+        if (diff != 0) {
+            idx += idx * (diff * FACTOR_SCALE / lastUnderlyingBalance) / FACTOR_SCALE;
+            lastUnderlyingBalance = currentBalance;
+        }
     }
 
     /**
@@ -195,10 +260,15 @@ contract EncumbranceWrapper is ERC20, IERC999 {
      * @return bool Whether the operation was successful
      */
     function burn(uint amount) public returns (bool) {
+        accrue();
+
         uint freeBalance = freeBalanceOf(msg.sender);
         require(freeBalance >= amount, "ERC999: burn amount exceeds free balance");
         _burn(msg.sender, amount);
         IERC20(underlyingToken).transfer(msg.sender, amount);
+
+        lastUnderlyingBalance -= amount;
+
         return true;
     }
 }
