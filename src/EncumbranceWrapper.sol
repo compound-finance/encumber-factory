@@ -43,6 +43,12 @@ contract EncumbranceWrapper is ERC20, IERC999 {
         return _decimals;
     }
 
+    function balanceOf(address owner) public view override returns (uint256) {
+        uint _totalSupply = super.totalSupply();
+        if (_totalSupply == 0) { return 0; }
+        return super.balanceOf(owner) * ERC20(underlyingToken).balanceOf(address(this)) / super.totalSupply();
+    }
+
     /**
      * @notice Amount of an address's token balance that is not encumbered
      * @param a Address to check the free balance of

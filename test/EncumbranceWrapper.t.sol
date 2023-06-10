@@ -2,7 +2,6 @@ pragma solidity ^0.8.15;
 
 import "forge-std/Test.sol";
 import "forge-std/StdUtils.sol";
-import "../src/erc20/IERC20Metadata.sol";
 import "../src/EncumbranceWrapper.sol";
 import "../src/erc20/ERC20.sol";
 
