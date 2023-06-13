@@ -237,9 +237,7 @@ contract EncumbranceWrapper is ERC20, IERC999 {
         accrue();
 
         IERC20(underlyingToken).transferFrom(msg.sender, address(this), amount);
-
-        // or just update it to be the underlyingToken.balanceOf(address(this));
-        lastUnderlyingBalance += amount;
+        lastUnderlyingBalance = ERC20(underlyingToken).balanceOf(address(this));
 
         _mint(recipient, amount);
         return true;
@@ -264,11 +262,11 @@ contract EncumbranceWrapper is ERC20, IERC999 {
 
         uint freeBalance = freeBalanceOf(msg.sender);
         require(freeBalance >= amount, "ERC999: burn amount exceeds free balance");
-        _burn(msg.sender, amount);
+
         IERC20(underlyingToken).transfer(msg.sender, amount);
+        lastUnderlyingBalance = ERC20(underlyingToken).balanceOf(address(this));
 
-        lastUnderlyingBalance -= amount;
-
+        _burn(msg.sender, amount);
         return true;
     }
 }
