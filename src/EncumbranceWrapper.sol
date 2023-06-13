@@ -111,6 +111,7 @@ contract EncumbranceWrapper is ERC20, IERC999 {
      * @return bool Whether the operation was successful
      */
     function transferFrom(address src, address dst, uint amount) public override returns (bool) {
+        accrue();
         uint encumberedToTaker = encumbrances[src][msg.sender];
         bool exceedsEncumbrance = amount > encumberedToTaker;
         if (exceedsEncumbrance)  {

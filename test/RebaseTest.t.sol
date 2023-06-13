@@ -84,8 +84,6 @@ contract RebaseTest is Test {
     function testTotalSupply() public {
         // alice and bob have 10 rebasing tokens
         deal(address(rebasingToken), alice, 10e18);
-        deal(address(rebasingToken), bob, 10e18);
-        deal(address(rebasingToken), charlie, 10e18);
 
         // is incremented by a mint
         vm.startPrank(alice);
@@ -106,5 +104,24 @@ contract RebaseTest is Test {
         assertEq(wrappedToken.totalSupply(), 10e18);
 
         vm.stopPrank();
+    }
+
+    function testTransferWithIndex() public {
+        // alice has 10 rebasing tokens
+        deal(address(rebasingToken), alice, 10e18);
+
+        vm.startPrank(alice);
+        rebasingToken.approve(address(wrappedToken), type(uint256).max);
+        wrappedToken.mint(alice, 10e18);
+        assertEq(wrappedToken.balanceOf(alice), 10e18);
+
+        // a rebase increases that balance
+        rebasingToken.mint(address(wrappedToken), 5e18);
+        assertEq(wrappedToken.balanceOf(alice), 15e18);
+
+        // she transfers 10 tokens to charlie
+        wrappedToken.transfer(charlie, 10e18);
+        assertEq(wrappedToken.balanceOf(alice), 5e18); // XXX is actully 5e18 + 1 wei
+        assertEq(wrappedToken.balanceOf(charlie), 10e18); // XXX is actually 10e18 - 1 wei
     }
 }
