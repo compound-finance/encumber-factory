@@ -21,6 +21,14 @@ contract EncumbranceWrapperTest is Test {
         wrappedToken = new EncumbranceWrapper(address(erc20));
     }
 
+    function mintWrappedToken(address owner, uint256 amount) internal {
+        vm.startPrank(owner);
+        deal(address(erc20), owner, amount);
+        erc20.approve(address(wrappedToken), type(uint256).max);
+        wrappedToken.mint(owner, amount);
+        vm.stopPrank();
+    }
+
     function testWrappedName() public {
         assertEq(wrappedToken.name(), "Encumberable TEST TOKEN");
     }
@@ -35,17 +43,15 @@ contract EncumbranceWrapperTest is Test {
     }
 
     function testFreeBalanceOf() public {
-        vm.startPrank(alice);
-
         // freeBalanceOf is 0 by default
         assertEq(wrappedToken.freeBalanceOf(alice), 0);
 
         // reflects balance when there are no encumbrances
-        deal(address(erc20), alice, 100e18);
-        erc20.approve(address(wrappedToken), type(uint256).max);
-        wrappedToken.mint(alice, 100e18);
+        mintWrappedToken(alice, 100e18);
         assertEq(wrappedToken.balanceOf(alice), 100e18);
         assertEq(wrappedToken.freeBalanceOf(alice), 100e18);
+
+        vm.startPrank(alice);
 
         // is reduced by encumbrances
         wrappedToken.encumber(bob, 20e18);
@@ -78,10 +84,9 @@ contract EncumbranceWrapperTest is Test {
     }
 
     function testTransferRevertInsufficentBalance() public {
-        deal(address(erc20), alice, 100e18);
+        mintWrappedToken(alice, 100e18);
+
         vm.startPrank(alice);
-        erc20.approve(address(wrappedToken), type(uint256).max);
-        wrappedToken.mint(alice, 100e18);
 
         // alice encumbers half her balance to bob
         wrappedToken.encumber(bob, 50e18);
@@ -94,10 +99,9 @@ contract EncumbranceWrapperTest is Test {
     }
 
     function testEncumberRevert() public {
-        deal(address(erc20), alice, 100e18);
+        mintWrappedToken(alice, 100e18);
+
         vm.startPrank(alice);
-        erc20.approve(address(wrappedToken), type(uint256).max);
-        wrappedToken.mint(alice, 100e18);
 
         // alice encumbers half her balance to bob
         wrappedToken.encumber(bob, 50e18);
@@ -110,10 +114,9 @@ contract EncumbranceWrapperTest is Test {
     }
 
     function testEncumber() public {
-        deal(address(erc20), alice, 100e18);
+        mintWrappedToken(alice, 100e18);
+
         vm.startPrank(alice);
-        erc20.approve(address(wrappedToken), type(uint256).max);
-        wrappedToken.mint(alice, 100e18);
 
         // emits Encumber event
         vm.expectEmit(true, true, true, true);
@@ -135,11 +138,9 @@ contract EncumbranceWrapperTest is Test {
     }
 
     function testTransferFromSufficientEncumbrance() public {
-        deal(address(erc20), alice, 100e18);
-        vm.startPrank(alice);
+        mintWrappedToken(alice, 100e18);
 
-        erc20.approve(address(wrappedToken), type(uint256).max);
-        wrappedToken.mint(alice, 100e18);
+        vm.startPrank(alice);
 
         // alice encumbers some of her balance to bob
         wrappedToken.encumber(bob, 60e18);
@@ -167,11 +168,9 @@ contract EncumbranceWrapperTest is Test {
     }
 
     function testTransferFromEncumbranceAndAllowance() public {
-        deal(address(erc20), alice, 100e18);
-        vm.startPrank(alice);
+        mintWrappedToken(alice, 100e18);
 
-        erc20.approve(address(wrappedToken), type(uint256).max);
-        wrappedToken.mint(alice, 100e18);
+        vm.startPrank(alice);
 
         // alice encumbers some of her balance to bob
         wrappedToken.encumber(bob, 20e18);
@@ -208,11 +207,9 @@ contract EncumbranceWrapperTest is Test {
     }
 
     function testTransferFromInsufficientAllowance() public {
-        deal(address(erc20), alice, 100e18);
+        mintWrappedToken(alice, 100e18);
 
         vm.startPrank(alice);
-        erc20.approve(address(wrappedToken), type(uint256).max);
-        wrappedToken.mint(alice, 100e18);
 
         // alice encumbers some of her balance to bob
         wrappedToken.encumber(bob, 10e18);
@@ -236,10 +233,9 @@ contract EncumbranceWrapperTest is Test {
     }
 
     function testEncumberFromInsufficientAllowance() public {
-        deal(address(erc20), alice, 100e18);
+        mintWrappedToken(alice, 100e18);
+
         vm.startPrank(alice);
-        erc20.approve(address(wrappedToken), type(uint256).max);
-        wrappedToken.mint(alice, 100e18);
 
         // alice grants bob an approval
         wrappedToken.approve(bob, 50e18);
@@ -253,10 +249,9 @@ contract EncumbranceWrapperTest is Test {
     }
 
     function testEncumberFrom() public {
-        deal(address(erc20), alice, 100e18);
+        mintWrappedToken(alice, 100e18);
+
         vm.startPrank(alice);
-        erc20.approve(address(wrappedToken), type(uint256).max);
-        wrappedToken.mint(alice, 100e18);
 
         // alice grants bob an approval
         wrappedToken.approve(bob, 100e18);
@@ -291,11 +286,9 @@ contract EncumbranceWrapperTest is Test {
     }
 
     function testRelease() public {
-        deal(address(erc20), alice, 100e18);
+        mintWrappedToken(alice, 100e18);
 
         vm.startPrank(alice);
-        erc20.approve(address(wrappedToken), type(uint256).max);
-        wrappedToken.mint(alice, 100e18);
 
         // alice encumbers some of her balance to bob
         wrappedToken.encumber(bob, 100e18);
