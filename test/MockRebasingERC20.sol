@@ -1,5 +1,3 @@
-// XXX license
-
 import "../src/erc20/ERC20.sol";
 
 pragma solidity ^0.8.15;
