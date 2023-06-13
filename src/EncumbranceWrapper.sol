@@ -93,6 +93,7 @@ contract EncumbranceWrapper is ERC20, IERC999 {
      * @return bool Whether the operation was successful
      */
     function transfer(address dst, uint amount) public override returns (bool) {
+        accrue();
         // check but dont spend encumbrance
         require(freeBalanceOf(msg.sender) >= amount, "ERC999: insufficient free balance");
         _transfer(msg.sender, dst, amount);

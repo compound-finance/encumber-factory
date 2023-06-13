@@ -101,7 +101,9 @@ contract RebaseTest is Test {
         wrappedToken.transfer(charlie, 10e18);
         assertEq(wrappedToken.totalSupply(), 15e18);
 
-        // XXX is reduced by a burn
+        // is reduced by a burn
+        wrappedToken.burn(5e18);
+        assertEq(wrappedToken.totalSupply(), 10e18);
 
         vm.stopPrank();
     }
