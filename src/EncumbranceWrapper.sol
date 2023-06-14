@@ -183,8 +183,9 @@ contract EncumbranceWrapper is ERC20, IERC999 {
      * @return bool Whether the operation was successful
      */
     function mint(address recipient, uint amount) external returns (bool) {
+        bool success = IERC20(underlyingToken).transferFrom(msg.sender, address(this), amount);
+        require(success, "ERC999: transfer failed");
         _mint(recipient, amount);
-        IERC20(underlyingToken).transferFrom(msg.sender, address(this), amount);
         return true;
     }
 
@@ -198,7 +199,8 @@ contract EncumbranceWrapper is ERC20, IERC999 {
         uint freeBalance = freeBalanceOf(msg.sender);
         require(freeBalance >= amount, "ERC999: burn amount exceeds free balance");
         _burn(msg.sender, amount);
-        IERC20(underlyingToken).transfer(recipient, amount);
+        bool success = IERC20(underlyingToken).transfer(recipient, amount);
+        require(success, "ERC999: transfer failed");
         return true;
     }
 }
