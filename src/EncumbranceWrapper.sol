@@ -79,8 +79,7 @@ contract EncumbranceWrapper is ERC20, IERC999 {
      */
     function transferFrom(address src, address dst, uint amount) public override returns (bool) {
         uint encumberedToTaker = encumbrances[src][msg.sender];
-        bool exceedsEncumbrance = amount > encumberedToTaker;
-        if (exceedsEncumbrance)  {
+        if (amount > encumberedToTaker)  {
             uint excessAmount = amount - encumberedToTaker;
             // Exceeds Encumbrance, so spend all of it
             _spendEncumbrance(src, msg.sender, encumberedToTaker);
