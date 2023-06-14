@@ -191,14 +191,15 @@ contract EncumbranceWrapper is ERC20, IERC999 {
 
     /**
      * @notice Destroys `amount` tokens and transfers the same amount of the underlying token to `recipient`
+     * @param recipient Address to burn tokens to
      * @param amount Number of tokens to burn
      * @return bool Whether the operation was successful
      */
-    function burn(uint amount) public returns (bool) {
+    function burn(address recipient, uint amount) public returns (bool) {
         uint freeBalance = freeBalanceOf(msg.sender);
         require(freeBalance >= amount, "ERC999: burn amount exceeds free balance");
         _burn(msg.sender, amount);
-        IERC20(underlyingToken).transfer(msg.sender, amount);
+        IERC20(underlyingToken).transfer(recipient, amount);
         return true;
     }
 }

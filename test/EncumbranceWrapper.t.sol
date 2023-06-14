@@ -334,7 +334,7 @@ contract EncumbranceWrapperTest is Test {
         assertEq(wrappedToken.totalSupply(), 40e18);
 
         // she burns 20 wrapped tokens
-        wrappedToken.burn(20e18);
+        wrappedToken.burn(alice, 20e18);
 
         // alice's balance of the wrapped token is decreased
         assertEq(wrappedToken.balanceOf(alice), 20e18);
@@ -371,7 +371,7 @@ contract EncumbranceWrapperTest is Test {
         // she encumbers her balance and then attempts to burn it
         wrappedToken.encumber(bob, 40e18);
         vm.expectRevert("ERC999: burn amount exceeds free balance");
-        wrappedToken.burn(40e18);
+        wrappedToken.burn(alice, 40e18);
 
         vm.stopPrank();
     }
