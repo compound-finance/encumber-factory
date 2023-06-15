@@ -124,7 +124,7 @@ contract EncumberableTokenTest is Test {
         assertEq(wrappedToken.encumbrances(alice, bob), 60e18);
 
         // updates encumbered balance of owner
-        assertEq(wrappedToken.encumberedBalance(alice), 60e18);
+        assertEq(wrappedToken.encumberedBalanceOf(alice), 60e18);
     }
 
     function testTransferFromSufficientEncumbrance() public {
@@ -136,7 +136,7 @@ contract EncumberableTokenTest is Test {
 
         assertEq(wrappedToken.balanceOf(alice), 100e18);
         assertEq(wrappedToken.freeBalanceOf(alice), 40e18);
-        assertEq(wrappedToken.encumberedBalance(alice), 60e18);
+        assertEq(wrappedToken.encumberedBalanceOf(alice), 60e18);
         assertEq(wrappedToken.encumbrances(alice, bob), 60e18);
         assertEq(wrappedToken.balanceOf(charlie), 0);
 
@@ -148,7 +148,7 @@ contract EncumberableTokenTest is Test {
         assertEq(wrappedToken.balanceOf(alice), 60e18);
         // alice encumbrance to bob is reduced
         assertEq(wrappedToken.freeBalanceOf(alice), 40e18);
-        assertEq(wrappedToken.encumberedBalance(alice), 20e18);
+        assertEq(wrappedToken.encumberedBalanceOf(alice), 20e18);
         assertEq(wrappedToken.encumbrances(alice, bob), 20e18);
         // transfer is completed
         assertEq(wrappedToken.balanceOf(charlie), 40e18);
@@ -168,7 +168,7 @@ contract EncumberableTokenTest is Test {
 
         assertEq(wrappedToken.balanceOf(alice), 100e18);
         assertEq(wrappedToken.freeBalanceOf(alice), 80e18);
-        assertEq(wrappedToken.encumberedBalance(alice), 20e18);
+        assertEq(wrappedToken.encumberedBalanceOf(alice), 20e18);
         assertEq(wrappedToken.encumbrances(alice, bob), 20e18);
         assertEq(wrappedToken.allowance(alice, bob), 30e18);
         assertEq(wrappedToken.balanceOf(charlie), 0);
@@ -182,7 +182,7 @@ contract EncumberableTokenTest is Test {
 
         // her encumbrance to bob has been fully spent
         assertEq(wrappedToken.freeBalanceOf(alice), 60e18);
-        assertEq(wrappedToken.encumberedBalance(alice), 0);
+        assertEq(wrappedToken.encumberedBalanceOf(alice), 0);
         assertEq(wrappedToken.encumbrances(alice, bob), 0);
 
         // her allowance to bob has been partially spent
@@ -207,7 +207,7 @@ contract EncumberableTokenTest is Test {
 
         assertEq(wrappedToken.balanceOf(alice), 100e18);
         assertEq(wrappedToken.freeBalanceOf(alice), 90e18);
-        assertEq(wrappedToken.encumberedBalance(alice), 10e18);
+        assertEq(wrappedToken.encumberedBalanceOf(alice), 10e18);
         assertEq(wrappedToken.encumbrances(alice, bob), 10e18);
         assertEq(wrappedToken.allowance(alice, bob), 20e18);
         assertEq(wrappedToken.balanceOf(charlie), 0);
@@ -240,7 +240,7 @@ contract EncumberableTokenTest is Test {
 
         assertEq(wrappedToken.balanceOf(alice), 100e18);
         assertEq(wrappedToken.freeBalanceOf(alice), 100e18);
-        assertEq(wrappedToken.encumberedBalance(alice), 0e18);
+        assertEq(wrappedToken.encumberedBalanceOf(alice), 0e18);
         assertEq(wrappedToken.encumbrances(alice, bob), 0e18);
         assertEq(wrappedToken.allowance(alice, bob), 100e18);
         assertEq(wrappedToken.balanceOf(charlie), 0);
@@ -258,7 +258,7 @@ contract EncumberableTokenTest is Test {
         // but free balance is reduced
         assertEq(wrappedToken.freeBalanceOf(alice), 40e18);
         // encumbrance to charlie is created
-        assertEq(wrappedToken.encumberedBalance(alice), 60e18);
+        assertEq(wrappedToken.encumberedBalanceOf(alice), 60e18);
         assertEq(wrappedToken.encumbrances(alice, bob), 0e18);
         assertEq(wrappedToken.encumbrances(alice, charlie), 60e18);
         // allowance is partially spent
@@ -275,7 +275,7 @@ contract EncumberableTokenTest is Test {
 
         assertEq(wrappedToken.balanceOf(alice), 100e18);
         assertEq(wrappedToken.freeBalanceOf(alice), 0);
-        assertEq(wrappedToken.encumberedBalance(alice), 100e18);
+        assertEq(wrappedToken.encumberedBalanceOf(alice), 100e18);
         assertEq(wrappedToken.encumbrances(alice, bob), 100e18);
 
         // bob releases part of the encumbrance
@@ -287,7 +287,7 @@ contract EncumberableTokenTest is Test {
 
         assertEq(wrappedToken.balanceOf(alice), 100e18);
         assertEq(wrappedToken.freeBalanceOf(alice), 40e18);
-        assertEq(wrappedToken.encumberedBalance(alice), 60e18);
+        assertEq(wrappedToken.encumberedBalanceOf(alice), 60e18);
         assertEq(wrappedToken.encumbrances(alice, bob), 60e18);
     }
 

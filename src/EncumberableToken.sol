@@ -19,7 +19,7 @@ contract EncumberableToken is ERC20, IERC999 {
     address public immutable underlyingToken;
 
     /// @notice Amount of an address's token balance that is encumbered
-    mapping (address => uint) public encumberedBalance;
+    mapping (address => uint) public encumberedBalanceOf;
 
     /// @notice Amount encumbered from owner to taker (owner => taker => balance)
     mapping (address => mapping (address => uint)) public encumbrances;
@@ -49,7 +49,7 @@ contract EncumberableToken is ERC20, IERC999 {
      * @return uint Unencumbered balance
      */
     function freeBalanceOf(address a) public view returns (uint) {
-        return (balanceOf(a) - encumberedBalance[a]);
+        return (balanceOf(a) - encumberedBalanceOf[a]);
     }
 
     /**
@@ -107,7 +107,7 @@ contract EncumberableToken is ERC20, IERC999 {
         require(currentEncumbrance >= amount, "insufficient encumbrance");
         uint newEncumbrance = currentEncumbrance - amount;
         encumbrances[owner][taker] = newEncumbrance;
-        encumberedBalance[owner] -= amount;
+        encumberedBalanceOf[owner] -= amount;
     }
 
     /**
@@ -128,7 +128,7 @@ contract EncumberableToken is ERC20, IERC999 {
     function _encumber(address owner, address taker, uint amount) private {
         require(freeBalanceOf(owner) >= amount, "ERC999: insufficient free balance");
         encumbrances[owner][taker] += amount;
-        encumberedBalance[owner] += amount;
+        encumberedBalanceOf[owner] += amount;
         emit Encumber(owner, taker, amount);
     }
 
@@ -171,7 +171,7 @@ contract EncumberableToken is ERC20, IERC999 {
           amount = encumbrances[owner][taker];
         }
         encumbrances[owner][taker] -= amount;
-        encumberedBalance[owner] -= amount;
+        encumberedBalanceOf[owner] -= amount;
         emit Release(owner, taker, amount);
     }
 
