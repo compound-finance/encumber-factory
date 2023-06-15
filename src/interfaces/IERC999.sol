@@ -3,7 +3,7 @@
 pragma solidity ^0.8.0;
 
 /**
- * @dev Interface of the ERC999 standard as defined in the EIP.
+ * @dev Interface of the ERC999 standard.
  */
 interface IERC999 {
     /**
@@ -12,30 +12,38 @@ interface IERC999 {
     event Encumber(address indexed owner, address indexed taker, uint amount);
 
     /**
-     * @dev Emitted when `amount` tokens are released from `owner` by `taker`.
+     * @dev Emitted when the encumbrance of a `taker` to an `owner` is reduced
+     * by `amount`.
      */
     event Release(address indexed owner, address indexed taker, uint amount);
 
     /**
-     * @dev Returns the amount of tokens owned by `owner` that are currently
-     * encumbered.
+     * @dev Returns the total amount of tokens owned by `owner` that are
+     * currently encumbered.  MUST never exceed `balanceOf(owner)`
+     *
+     * Any function which would reduce balanceOf(owner) below
+     * encumberedBalanceOf(owner) MUST revert
      */
-    function encumberedBalance(address owner) external returns (uint);
+    function encumberedBalanceOf(address owner) external returns (uint);
 
     /**
      * @dev Returns the number of tokens that `owner` has encumbered to `taker`.
-     * This is zero by default.
      *
-     * This value changes when {encumber}, {encumberFrom}, {release},
-     * {transfer}, or {transferFrom} are called.
+     * This value increases when {encumber} or {encumberFrom} are called by the
+     * `owner` or by another permitted account.
+     * This value decreases when {release} and {transferFrom} are called by
+     * `taker`.
      */
     function encumbrances(address owner, address taker) external returns (uint);
 
     /**
      * @dev Increases the amount of tokens that the caller has encumbered to
      * `taker` by `amount`.
+     * Grants to `taker` a guaranteed right to transfer `amount` from the
+     * caller's balance by using `transferFrom`.
      *
-     * Returns a boolean value indicating whether the operation succeeded.
+     * MUST revert if caller does not have `amount` tokens available (e.g. if
+     * `balanceOf(caller) - encumbrances(caller) < amount`).
      *
      * Emits an {Encumber} event.
      */
@@ -43,10 +51,15 @@ interface IERC999 {
 
     /**
      * @dev Increases the amount of tokens that `owner` has encumbered to
-     * `taker` by `amount`. `amount` is then deducted from the caller's
-     * allowance.
+     * `taker` by `amount`.
+     * Grants to `taker` a guaranteed right to transfer `amount` from `owner`
+     * using transferFrom
      *
-     * Returns a boolean value indicating whether the operation succeeded.
+     * The function SHOULD revert unless the owner account has deliberately
+     * authorized the sender of the message via some mechanism.
+     *
+     * MUST revert if `owner` does not have `amount` tokens available (e.g. if
+     * `balanceOf(owner) - encumbrances(owner) < amount`).
      *
      * Emits an {Encumber} event.
      */
@@ -56,9 +69,6 @@ interface IERC999 {
      * @dev Reduces amount of tokens encumbered from `owner` to caller by
      * `amount`.
      *
-     * Returns a boolean value indicating whether the operation succeeded.
-     *
      * Emits a {Release} event.
      */
     function release(address owner, uint amount) external returns (bool);
-}
