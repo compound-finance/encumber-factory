@@ -5,7 +5,7 @@ import "./EncumbranceWrapper.sol";
 contract EncumbranceWrapperFactory {
     bytes32 constant SALT = "";
 
-    function deploy(address underlyingToken) public returns (address) {
+    function deploy(address underlyingToken) external returns (address) {
         EncumbranceWrapper wrapper = createWrapper(underlyingToken);
         return address(wrapper);
     }
@@ -14,7 +14,7 @@ contract EncumbranceWrapperFactory {
         return new EncumbranceWrapper{salt: ""}(underlyingToken);
     }
 
-    function getDeploymentAddress(address underlyingToken) public view returns (address) {
+    function getDeploymentAddress(address underlyingToken) external view returns (address) {
         address predictedAddress = address(uint160(uint(keccak256(abi.encodePacked(
             bytes1(0xff),
             address(this),
