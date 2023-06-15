@@ -6,12 +6,12 @@ import "./erc20/IERC20Metadata.sol";
 import "./interfaces/IERC999.sol";
 
 /**
- * @title EncumbranceWrapper
+ * @title EncumberableToken
  * @notice A contract that takes an existing ERC20 and creates a wrapped token
  * with encumbrance capabilities
  * @author Compound
  */
-contract EncumbranceWrapper is ERC20, IERC999 {
+contract EncumberableToken is ERC20, IERC999 {
     /// @notice Number of decimals used for the user represenation of the token
     uint8 private immutable _decimals;
 

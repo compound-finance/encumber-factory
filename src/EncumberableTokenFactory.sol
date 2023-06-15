@@ -1,17 +1,17 @@
 pragma solidity ^0.8.15;
 
-import "./EncumbranceWrapper.sol";
+import "./EncumberableToken.sol";
 
-contract EncumbranceWrapperFactory {
+contract EncumberableTokenFactory {
     bytes32 constant SALT = "";
 
     function deploy(address underlyingToken) external returns (address) {
-        EncumbranceWrapper wrapper = createWrapper(underlyingToken);
+        EncumberableToken wrapper = createEncumberableToken(underlyingToken);
         return address(wrapper);
     }
 
-    function createWrapper(address underlyingToken) internal returns (EncumbranceWrapper) {
-        return new EncumbranceWrapper{salt: ""}(underlyingToken);
+    function createEncumberableToken(address underlyingToken) internal returns (EncumberableToken) {
+        return new EncumberableToken{salt: ""}(underlyingToken);
     }
 
     function getDeploymentAddress(address underlyingToken) external view returns (address) {
@@ -20,7 +20,7 @@ contract EncumbranceWrapperFactory {
             address(this),
             SALT,
             keccak256(abi.encodePacked(
-                type(EncumbranceWrapper).creationCode,
+                type(EncumberableToken).creationCode,
                 abi.encode(underlyingToken)
             ))
         )))));

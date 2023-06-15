@@ -3,23 +3,23 @@ pragma solidity ^0.8.15;
 import "forge-std/Test.sol";
 import "forge-std/StdUtils.sol";
 import "../src/erc20/IERC20Metadata.sol";
-import "../src/EncumbranceWrapper.sol";
+import "../src/EncumberableToken.sol";
 import "../src/erc20/ERC20.sol";
 
-contract EncumbranceWrapperTest is Test {
+contract EncumberableTokenTest is Test {
     event Encumber(address indexed owner, address indexed taker, uint amount);
     event Release(address indexed owner, address indexed taker, uint amount);
 
-    ERC20 public erc20;
-    EncumbranceWrapper public wrappedToken;
+    ERC20 public underlyingToken;
+    EncumberableToken public wrappedToken;
 
     address alice = address(10);
     address bob = address(11);
     address charlie = address(12);
 
     function setUp() public {
-        erc20 = new ERC20("TEST TOKEN", "TTKN");
-        wrappedToken = new EncumbranceWrapper(address(erc20));
+        underlyingToken = new ERC20("TEST TOKEN", "TTKN");
+        wrappedToken = new EncumberableToken(address(underlyingToken));
     }
 
     function testWrappedName() public {
@@ -293,17 +293,17 @@ contract EncumbranceWrapperTest is Test {
 
     function testMint() public {
         // alice has a balance of the underlying token
-        deal(address(erc20), alice, 100e18);
+        deal(address(underlyingToken), alice, 100e18);
 
         // she mints 40 wrapped tokens to bob
         vm.startPrank(alice);
-        erc20.approve(address(wrappedToken), 100e18);
+        underlyingToken.approve(address(wrappedToken), 100e18);
         wrappedToken.mint(bob, 40e18);
         vm.stopPrank();
 
         // the underlying token has been transferred in from alice
-        assertEq(erc20.balanceOf(alice), 60e18);
-        assertEq(erc20.balanceOf(address(wrappedToken)), 40e18);
+        assertEq(underlyingToken.balanceOf(alice), 60e18);
+        assertEq(underlyingToken.balanceOf(address(wrappedToken)), 40e18);
 
         // bob has a balance of the wrapped token
         assertEq(wrappedToken.balanceOf(bob), 40e18);
@@ -316,16 +316,16 @@ contract EncumbranceWrapperTest is Test {
 
     function testBurn() public {
         // alice has a balance of the underlying token
-        deal(address(erc20), alice, 100e18);
+        deal(address(underlyingToken), alice, 100e18);
 
         // she mints 40 wrapped tokens to herself
         vm.startPrank(alice);
-        erc20.approve(address(wrappedToken), 100e18);
+        underlyingToken.approve(address(wrappedToken), 100e18);
         wrappedToken.mint(alice, 40e18);
 
         // the underlying token has been transferred in from alice
-        assertEq(erc20.balanceOf(alice), 60e18);
-        assertEq(erc20.balanceOf(address(wrappedToken)), 40e18);
+        assertEq(underlyingToken.balanceOf(alice), 60e18);
+        assertEq(underlyingToken.balanceOf(address(wrappedToken)), 40e18);
 
         // alice has a balance of the wrapped token
         assertEq(wrappedToken.balanceOf(alice), 40e18);
@@ -343,24 +343,24 @@ contract EncumbranceWrapperTest is Test {
         assertEq(wrappedToken.totalSupply(), 20e18);
 
         // the underlying token has been transferred back to alice
-        assertEq(erc20.balanceOf(alice), 80e18);
-        assertEq(erc20.balanceOf(address(wrappedToken)), 20e18);
+        assertEq(underlyingToken.balanceOf(alice), 80e18);
+        assertEq(underlyingToken.balanceOf(address(wrappedToken)), 20e18);
 
         vm.stopPrank();
     }
 
     function testBurnInsufficientFreeBalance() public {
         // alice has a balance of the underlying token
-        deal(address(erc20), alice, 100e18);
+        deal(address(underlyingToken), alice, 100e18);
 
         // she mints 40 wrapped tokens to herself
         vm.startPrank(alice);
-        erc20.approve(address(wrappedToken), 100e18);
+        underlyingToken.approve(address(wrappedToken), 100e18);
         wrappedToken.mint(alice, 40e18);
 
         // the underlying token has been transferred in from alice
-        assertEq(erc20.balanceOf(alice), 60e18);
-        assertEq(erc20.balanceOf(address(wrappedToken)), 40e18);
+        assertEq(underlyingToken.balanceOf(alice), 60e18);
+        assertEq(underlyingToken.balanceOf(address(wrappedToken)), 40e18);
 
         // alice has a balance of the wrapped token
         assertEq(wrappedToken.balanceOf(alice), 40e18);

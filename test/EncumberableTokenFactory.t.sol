@@ -1,34 +1,34 @@
 pragma solidity ^0.8.15;
 
 import "forge-std/Test.sol";
-import "../src/EncumbranceWrapperFactory.sol";
+import "../src/EncumberableTokenFactory.sol";
 import "../src/erc20/ERC20.sol";
 import "../src/erc20/IERC20Metadata.sol";
 
 
-contract EncumbranceWrapperFactoryTest is Test {
-    EncumbranceWrapperFactory public wrapperFactory;
+contract EncumberableTokenFactoryTest is Test {
+    EncumberableTokenFactory public wrapperFactory;
     ERC20 public erc20;
-    address public wrappedTestToken;
+    address public wrappedToken;
 
     function setUp() public {
-        wrapperFactory = new EncumbranceWrapperFactory();
+        wrapperFactory = new EncumberableTokenFactory();
         erc20 = new ERC20("TEST TOKEN", "TTKN");
-        wrappedTestToken = wrapperFactory.deploy(address(erc20));
+        wrappedToken = wrapperFactory.deploy(address(erc20));
     }
 
     function testWrappedName() public {
-        assertEq(IERC20Metadata(wrappedTestToken).name(), "Encumberable TEST TOKEN");
+        assertEq(IERC20Metadata(wrappedToken).name(), "Encumberable TEST TOKEN");
     }
 
     function testWrappedSymbol() public {
-        assertEq(IERC20Metadata(wrappedTestToken).symbol(), "eTTKN");
+        assertEq(IERC20Metadata(wrappedToken).symbol(), "eTTKN");
     }
 
     function testGetDeploymentAddress() public {
         assertEq(
             wrapperFactory.getDeploymentAddress(address(erc20)),
-            wrappedTestToken
+            wrappedToken
         );
     }
 
