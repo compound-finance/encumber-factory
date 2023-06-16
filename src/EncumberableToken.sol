@@ -4,6 +4,7 @@ pragma solidity ^0.8.15;
 import "./erc20/ERC20.sol";
 import "./erc20/IERC20.sol";
 import "./erc20/IERC20Metadata.sol";
+import "./erc20/IERC20Permit.sol";
 import "./interfaces/IERC999.sol";
 
 /**
@@ -12,7 +13,7 @@ import "./interfaces/IERC999.sol";
  * with encumbrance capabilities
  * @author Compound
  */
-contract EncumberableToken is ERC20, IERC999 {
+contract EncumberableToken is ERC20, IERC20Permit, IERC999 {
     /// @notice Number of decimals used for the user represenation of the token
     uint8 private immutable _decimals;
 
@@ -203,5 +204,59 @@ contract EncumberableToken is ERC20, IERC999 {
         bool success = IERC20(underlyingToken).transfer(recipient, amount);
         require(success, "ERC999: transfer failed");
         return true;
+    }
+
+    /// @notice The next expected nonce for an address, for validating authorizations via signature
+    mapping(address => uint) public nonces;
+
+    /// @notice The major version of this contract
+    string public constant version = "0";
+
+    /// @dev The highest valid value for s in an ECDSA signature pair (0 < s < secp256k1n ÷ 2 + 1)
+    ///  See https://ethereum.github.io/yellowpaper/paper.pdf #307)
+    uint internal constant MAX_VALID_ECDSA_S = 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0;
+
+    /// @dev The EIP-712 typehash for the contract's domain
+    bytes32 internal constant DOMAIN_TYPEHASH = keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)");
+
+    /// @dev The EIP-712 typehash for authorization via permit
+    bytes32 internal constant AUTHORIZATION_TYPEHASH = keccak256("Authorization(address owner,address spender,uint256 amount,uint256 nonce,uint256 expiry)");
+
+    // XXX
+    function DOMAIN_SEPARATOR() public view returns (bytes32) {
+        return keccak256(abi.encode(DOMAIN_TYPEHASH, keccak256(bytes(name())), keccak256(bytes(version)), block.chainid, address(this)));
+    }
+
+    /**
+     * @notice Sets authorization status for a manager via signature from signatory
+     * @param owner The address that signed the signature
+     * @param spender The address to authorize (or rescind authorization from)
+     * @param amount Amount that `owner` is approving for `spender`
+     * @param expiry Expiration time for the signature
+     * @param v The recovery byte of the signature
+     * @param r Half of the ECDSA signature pair
+     * @param s Half of the ECDSA signature pair
+     */
+    function permit(
+        address owner,
+        address spender,
+        uint256 amount,
+        uint256 expiry,
+        uint8 v,
+        bytes32 r,
+        bytes32 s
+    ) external {
+        if (uint256(s) > MAX_VALID_ECDSA_S) revert('InvalidValueS');
+        // v ∈ {27, 28} (source: https://ethereum.github.io/yellowpaper/paper.pdf #308)
+        if (v != 27 && v != 28) revert('InvalidValueV');
+        uint nonce = nonces[owner];
+        bytes32 structHash = keccak256(abi.encode(AUTHORIZATION_TYPEHASH, owner, spender, amount, nonce, expiry));
+        bytes32 digest = keccak256(abi.encodePacked("\x19\x01", DOMAIN_SEPARATOR(), structHash));
+        address signatory = ecrecover(digest, v, r, s);
+        if (signatory == address(0)) revert('BadSignatory');
+        if (owner != signatory) revert('BadSignatory');
+        if (block.timestamp >= expiry) revert('SignatureExpired');
+        _approve(owner, spender, amount);
+        nonces[signatory]++;
     }
 }
