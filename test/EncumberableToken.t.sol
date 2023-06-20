@@ -312,7 +312,18 @@ contract EncumberableTokenTest is Test {
         assertEq(wrappedToken.totalSupply(), 40e18);
     }
 
-    // XXX revert when minting more than you have
+    function testMintRevert() public {
+        // alice has a balance of the underlying token
+        deal(address(underlyingToken), alice, 100e18);
+
+        // she mints more than she has in the underlying token
+        vm.startPrank(alice);
+        underlyingToken.approve(address(wrappedToken), type(uint256).max);
+
+        vm.expectRevert("ERC20: transfer amount exceeds balance");
+        wrappedToken.mint(alice, 200e18);
+        vm.stopPrank();
+    }
 
     function testBurn() public {
         // alice has a balance of the underlying token
@@ -375,6 +386,4 @@ contract EncumberableTokenTest is Test {
 
         vm.stopPrank();
     }
-
-    // XXX burning more than you have
 }
