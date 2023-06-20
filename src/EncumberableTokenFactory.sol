@@ -12,7 +12,7 @@ contract EncumberableTokenFactory {
     }
 
     function createEncumberableToken(address underlyingToken) internal returns (EncumberableToken) {
-        return new EncumberableToken{salt: ""}(underlyingToken);
+        return new EncumberableToken{salt: SALT}(underlyingToken);
     }
 
     function getDeploymentAddress(address underlyingToken) external view returns (address) {
