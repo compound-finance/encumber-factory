@@ -14,11 +14,27 @@ import "./interfaces/IERC999.sol";
  * @author Compound
  */
 contract EncumberableToken is ERC20, IERC20Permit, IERC999 {
+    /// @notice The major version of this contract
+    string public constant version = "0";
+
+    /// @dev The highest valid value for s in an ECDSA signature pair (0 < s < secp256k1n ÷ 2 + 1)
+    ///  See https://ethereum.github.io/yellowpaper/paper.pdf #307)
+    uint internal constant MAX_VALID_ECDSA_S = 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0;
+
+    /// @dev The EIP-712 typehash for authorization via permit
+    bytes32 internal constant AUTHORIZATION_TYPEHASH = keccak256("Authorization(address owner,address spender,uint256 amount,uint256 nonce,uint256 expiry)");
+
+    /// @dev The EIP-712 typehash for the contract's domain
+    bytes32 internal constant DOMAIN_TYPEHASH = keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)");
+
     /// @notice Number of decimals used for the user represenation of the token
     uint8 private immutable _decimals;
 
     /// @notice Address of the ERC20 token that this token wraps
     address public immutable underlyingToken;
+
+    /// @notice The next expected nonce for an address, for validating authorizations via signature
+    mapping(address => uint) public nonces;
 
     /// @notice Amount of an address's token balance that is encumbered
     mapping (address => uint) public encumberedBalanceOf;
@@ -195,22 +211,6 @@ contract EncumberableToken is ERC20, IERC20Permit, IERC999 {
         bool success = IERC20(underlyingToken).transfer(recipient, amount);
         require(success, "ERC999: transfer failed");
     }
-
-    /// @notice The next expected nonce for an address, for validating authorizations via signature
-    mapping(address => uint) public nonces;
-
-    /// @notice The major version of this contract
-    string public constant version = "0";
-
-    /// @dev The highest valid value for s in an ECDSA signature pair (0 < s < secp256k1n ÷ 2 + 1)
-    ///  See https://ethereum.github.io/yellowpaper/paper.pdf #307)
-    uint internal constant MAX_VALID_ECDSA_S = 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0;
-
-    /// @dev The EIP-712 typehash for the contract's domain
-    bytes32 internal constant DOMAIN_TYPEHASH = keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)");
-
-    /// @dev The EIP-712 typehash for authorization via permit
-    bytes32 internal constant AUTHORIZATION_TYPEHASH = keccak256("Authorization(address owner,address spender,uint256 amount,uint256 nonce,uint256 expiry)");
 
     // XXX
     function DOMAIN_SEPARATOR() public view returns (bytes32) {
