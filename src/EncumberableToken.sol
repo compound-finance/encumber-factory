@@ -200,7 +200,8 @@ contract EncumberableToken is ERC20, IERC20Permit, IERC999 {
     }
 
     /**
-     * @notice Destroys `amount` tokens and transfers the same amount of the underlying token to `recipient`
+     * @notice Destroys `amount` tokens and transfers the same amount of the
+     * underlying token to `recipient`
      * @param recipient Address to burn tokens to
      * @param amount Number of tokens to burn
      */
@@ -212,7 +213,10 @@ contract EncumberableToken is ERC20, IERC20Permit, IERC999 {
         require(success, "ERC999: transfer failed");
     }
 
-    // XXX
+    /**
+     * @notice Returns the domain separator used in the encoding of the
+     * signature for permit
+     */
     function DOMAIN_SEPARATOR() public view returns (bytes32) {
         return keccak256(abi.encode(DOMAIN_TYPEHASH, keccak256(bytes(name())), keccak256(bytes(version)), block.chainid, address(this)));
     }
