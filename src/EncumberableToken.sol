@@ -117,11 +117,9 @@ contract EncumberableToken is ERC20, IERC20Permit, IERC999 {
      * `taker` by `amount`
      * @param taker Address to increase encumbrance to
      * @param amount Amount of tokens to increase the encumbrance by
-     * @return bool Whether the operation was successful
      */
-    function encumber(address taker, uint amount) external returns (bool) {
+    function encumber(address taker, uint amount) external {
         _encumber(msg.sender, taker, amount);
-        return true;
     }
 
     /**
@@ -141,14 +139,12 @@ contract EncumberableToken is ERC20, IERC20Permit, IERC999 {
      * @param owner Address to increase encumbrance from
      * @param taker Address to increase encumbrance to
      * @param amount Amount of tokens to increase the encumbrance to `taker` by
-     * @return bool Whether the operation was successful
      */
-    function encumberFrom(address owner, address taker, uint amount) external returns (bool) {
+    function encumberFrom(address owner, address taker, uint amount) external {
         require(allowance(owner, msg.sender) >= amount, "ERC999: insufficient allowance");
         // spend caller's allowance
         _spendAllowance(owner, msg.sender, amount);
         _encumber(owner, taker, amount);
-        return true;
     }
 
     /**
@@ -158,11 +154,9 @@ contract EncumberableToken is ERC20, IERC20Permit, IERC999 {
      * current encumbrance to caller
      * @param owner Address to decrease encumbrance from
      * @param amount Amount of tokens to decrease the encumbrance by
-     * @return bool Whether the operation was successful
      */
-    function release(address owner, uint amount) external returns (bool) {
+    function release(address owner, uint amount) external {
         _release(owner, msg.sender, amount);
-        return true;
     }
 
     /**
@@ -182,28 +176,24 @@ contract EncumberableToken is ERC20, IERC20Permit, IERC999 {
      * exchange for an equal amount of the underlying token
      * @param recipient Address to mint tokens to
      * @param amount Number of tokens to mint
-     * @return bool Whether the operation was successful
      */
-    function mint(address recipient, uint amount) external returns (bool) {
+    function mint(address recipient, uint amount) external {
         bool success = IERC20(underlyingToken).transferFrom(msg.sender, address(this), amount);
         require(success, "ERC999: transfer failed");
         _mint(recipient, amount);
-        return true;
     }
 
     /**
      * @notice Destroys `amount` tokens and transfers the same amount of the underlying token to `recipient`
      * @param recipient Address to burn tokens to
      * @param amount Number of tokens to burn
-     * @return bool Whether the operation was successful
      */
-    function burn(address recipient, uint amount) public returns (bool) {
+    function burn(address recipient, uint amount) external {
         uint freeBalance = freeBalanceOf(msg.sender);
         require(freeBalance >= amount, "ERC999: burn amount exceeds free balance");
         _burn(msg.sender, amount);
         bool success = IERC20(underlyingToken).transfer(recipient, amount);
         require(success, "ERC999: transfer failed");
-        return true;
     }
 
     /// @notice The next expected nonce for an address, for validating authorizations via signature

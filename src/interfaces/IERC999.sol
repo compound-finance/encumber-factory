@@ -47,7 +47,7 @@ interface IERC999 {
      *
      * Emits an {Encumber} event.
      */
-    function encumber(address taker, uint amount) external returns (bool);
+    function encumber(address taker, uint amount) external;
 
     /**
      * @dev Increases the amount of tokens that `owner` has encumbered to
@@ -63,7 +63,7 @@ interface IERC999 {
      *
      * Emits an {Encumber} event.
      */
-    function encumberFrom(address owner, address taker, uint amount) external returns (bool);
+    function encumberFrom(address owner, address taker, uint amount) external;
 
     /**
      * @dev Reduces amount of tokens encumbered from `owner` to caller by
@@ -71,5 +71,5 @@ interface IERC999 {
      *
      * Emits a {Release} event.
      */
-    function release(address owner, uint amount) external returns (bool);
+    function release(address owner, uint amount) external;
 }
