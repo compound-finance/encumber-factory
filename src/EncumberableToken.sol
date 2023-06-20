@@ -240,16 +240,16 @@ contract EncumberableToken is ERC20, IERC20Permit, IERC999 {
         bytes32 r,
         bytes32 s
     ) external {
-        if (uint256(s) > MAX_VALID_ECDSA_S) revert('InvalidValueS');
+        require(uint256(s) <= MAX_VALID_ECDSA_S, "Invalid value s");
         // v ∈ {27, 28} (source: https://ethereum.github.io/yellowpaper/paper.pdf #308)
-        if (v != 27 && v != 28) revert('InvalidValueV');
+        require(v == 27 || v == 28, 'Invalid value v');
         uint nonce = nonces[owner];
         bytes32 structHash = keccak256(abi.encode(AUTHORIZATION_TYPEHASH, owner, spender, amount, nonce, expiry));
         bytes32 digest = keccak256(abi.encodePacked("\x19\x01", DOMAIN_SEPARATOR(), structHash));
         address signatory = ecrecover(digest, v, r, s);
-        if (signatory == address(0)) revert('BadSignatory');
-        if (owner != signatory) revert('BadSignatory');
-        if (block.timestamp >= expiry) revert('SignatureExpired');
+        require(signatory != address(0), 'Bad signatory');
+        require(owner == signatory, 'Bad signatory');
+        require(block.timestamp < expiry, 'Signature expired');
         _approve(owner, spender, amount);
         nonces[signatory]++;
     }

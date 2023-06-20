@@ -63,7 +63,7 @@ contract PermiTest is Test {
 
         // bob calls permit with the signature, but he manipulates the owner
         vm.prank(bob);
-        vm.expectRevert("BadSignatory");
+        vm.expectRevert("Bad signatory");
         wrappedToken.permit(charlie, bob, allowance, expiry, v, r, s);
 
         // bob's allowance from alice is unchanged
@@ -85,7 +85,7 @@ contract PermiTest is Test {
 
         // bob calls permit with the signature, but he manipulates the spender
         vm.prank(bob);
-        vm.expectRevert("BadSignatory");
+        vm.expectRevert("Bad signatory");
         wrappedToken.permit(alice, charlie, allowance, expiry, v, r, s);
 
         // bob's allowance from alice is unchanged
@@ -107,7 +107,7 @@ contract PermiTest is Test {
 
         // bob calls permit with the signature, but he manipulates the allowance
         vm.prank(bob);
-        vm.expectRevert("BadSignatory");
+        vm.expectRevert("Bad signatory");
         wrappedToken.permit(alice, bob, allowance + 1 wei, expiry, v, r, s);
 
         // bob's allowance from alice is unchanged
@@ -129,7 +129,7 @@ contract PermiTest is Test {
 
         // bob calls permit with the signature, but he manipulates the expiry
         vm.prank(bob);
-        vm.expectRevert("BadSignatory");
+        vm.expectRevert("Bad signatory");
         wrappedToken.permit(alice, bob, allowance, expiry + 1, v, r, s);
 
         // bob's allowance from alice is unchanged
@@ -153,7 +153,7 @@ contract PermiTest is Test {
 
         // bob calls permit with the signature, but he manipulates the expiry
         vm.prank(bob);
-        vm.expectRevert("BadSignatory");
+        vm.expectRevert("Bad signatory");
         wrappedToken.permit(alice, bob, allowance, expiry, v, r, s);
 
         // bob's allowance from alice is unchanged
@@ -190,7 +190,7 @@ contract PermiTest is Test {
 
         // bob tries to reuse the same signature twice
         vm.prank(bob);
-        vm.expectRevert("BadSignatory");
+        vm.expectRevert("Bad signatory");
         wrappedToken.permit(alice, bob, allowance, expiry, v, r, s);
 
 
@@ -216,7 +216,7 @@ contract PermiTest is Test {
 
         // bob calls permit with the signature, but he manipulates the expiry
         vm.prank(bob);
-        vm.expectRevert("SignatureExpired");
+        vm.expectRevert("Signature expired");
         wrappedToken.permit(alice, bob, allowance, expiry, v, r, s);
 
         // bob's allowance from alice is unchanged
@@ -239,7 +239,7 @@ contract PermiTest is Test {
 
         // bob calls permit with the signature, but he manipulates the expiry
         vm.prank(bob);
-        vm.expectRevert("InvalidValueV");
+        vm.expectRevert("Invalid value v");
         wrappedToken.permit(alice, bob, allowance, expiry, invalidV, r, s);
 
         // bob's allowance from alice is unchanged
@@ -264,7 +264,7 @@ contract PermiTest is Test {
 
         // bob calls permit with the signature, but he manipulates the expiry
         vm.prank(bob);
-        vm.expectRevert("InvalidValueS");
+        vm.expectRevert("Invalid value s");
         wrappedToken.permit(alice, bob, allowance, expiry, v, r, invalidS);
 
         // bob's allowance from alice is unchanged
