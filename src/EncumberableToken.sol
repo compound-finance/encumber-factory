@@ -4,6 +4,7 @@ pragma solidity ^0.8.15;
 import "./erc20/ERC20.sol";
 import "./erc20/IERC20.sol";
 import "./erc20/IERC20Metadata.sol";
+import "./erc20/IERC20NonStandard.sol";
 import "./erc20/IERC20Permit.sol";
 import "./interfaces/IERC999.sol";
 
@@ -194,8 +195,7 @@ contract EncumberableToken is ERC20, IERC20Permit, IERC999 {
      * @param amount Number of tokens to mint
      */
     function mint(address recipient, uint amount) external {
-        bool success = IERC20(underlyingToken).transferFrom(msg.sender, address(this), amount);
-        require(success, "ERC999: transfer failed");
+        doTransferIn(underlyingToken, msg.sender, amount);
         _mint(recipient, amount);
     }
 
@@ -209,8 +209,7 @@ contract EncumberableToken is ERC20, IERC20Permit, IERC999 {
         uint freeBalance = freeBalanceOf(msg.sender);
         require(freeBalance >= amount, "ERC999: burn amount exceeds free balance");
         _burn(msg.sender, amount);
-        bool success = IERC20(underlyingToken).transfer(recipient, amount);
-        require(success, "ERC999: transfer failed");
+        doTransferOut(underlyingToken, recipient, amount);
     }
 
     /**
@@ -252,5 +251,60 @@ contract EncumberableToken is ERC20, IERC20Permit, IERC999 {
         require(block.timestamp < expiry, 'Signature expired');
         _approve(owner, spender, amount);
         nonces[signatory]++;
+    }
+
+    /**
+     * @notice Similar to ERC-20 transfer, except it properly handles `transferFrom` from non-standard ERC-20 tokens
+     * @param asset The ERC-20 token to transfer in
+     * @param from The address to transfer from
+     * @param amount The amount of the token to transfer
+     * @dev Note: This does not check that the amount transferred in is actually equals to the amount specified (e.g. fee tokens will not revert)
+     * @dev Note: This wrapper safely handles non-standard ERC-20 tokens that do not return a value. See here: https://medium.com/coinmonks/missing-return-value-bug-at-least-130-tokens-affected-d67bf08521ca
+     */
+    function doTransferIn(address asset, address from, uint amount) internal {
+        IERC20NonStandard(asset).transferFrom(from, address(this), amount);
+
+        bool success;
+        assembly {
+            switch returndatasize()
+                case 0 {                       // This is a non-standard ERC-20
+                    success := not(0)          // set success to true
+                }
+                case 32 {                      // This is a compliant ERC-20
+                    returndatacopy(0, 0, 32)
+                    success := mload(0)        // Set `success = returndata` of override external call
+                }
+                default {                      // This is an excessively non-compliant ERC-20, revert.
+                    revert(0, 0)
+                }
+        }
+        require(success, "Transfer in failed");
+    }
+
+    /**
+     * @notice Similar to ERC-20 transfer, except it properly handles `transfer` from non-standard ERC-20 tokens
+     * @param asset The ERC-20 token to transfer out
+     * @param to The recipient of the token transfer
+     * @param amount The amount of the token to transfer
+     * @dev Note: This wrapper safely handles non-standard ERC-20 tokens that do not return a value. See here: https://medium.com/coinmonks/missing-return-value-bug-at-least-130-tokens-affected-d67bf08521ca
+     */
+    function doTransferOut(address asset, address to, uint amount) internal {
+        IERC20NonStandard(asset).transfer(to, amount);
+
+        bool success;
+        assembly {
+            switch returndatasize()
+                case 0 {                      // This is a non-standard ERC-20
+                    success := not(0)         // set success to true
+                }
+                case 32 {                     // This is a compliant ERC-20
+                    returndatacopy(0, 0, 32)
+                    success := mload(0)       // Set `success = returndata` of override external call
+                }
+                default {                     // This is an excessively non-compliant ERC-20, revert.
+                    revert(0, 0)
+                }
+        }
+        require(success, "Transfer out failed");
     }
 }
