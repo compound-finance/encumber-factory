@@ -221,7 +221,7 @@ contract EncumberableToken is ERC20, IERC20Permit, IERC999 {
     }
 
     /**
-     * @notice Sets authorization status for a manager via signature from signatory
+     * @notice Sets approval amount for a spender via signature from signatory
      * @param owner The address that signed the signature
      * @param spender The address to authorize (or rescind authorization from)
      * @param amount Amount that `owner` is approving for `spender`
