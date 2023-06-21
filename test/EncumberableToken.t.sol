@@ -35,26 +35,26 @@ contract EncumberableTokenTest is Test {
         assertEq(wrappedToken.decimals(), 18);
     }
 
-    function testFreeBalanceOf() public {
+    function testAvailableBalanceOf() public {
         vm.startPrank(alice);
 
-        // freeBalanceOf is 0 by default
-        assertEq(wrappedToken.freeBalanceOf(alice), 0);
+        // availableBalanceOf is 0 by default
+        assertEq(wrappedToken.availableBalanceOf(alice), 0);
 
         // reflects balance when there are no encumbrances
         deal(address(wrappedToken), alice, 100e18);
         assertEq(wrappedToken.balanceOf(alice), 100e18);
-        assertEq(wrappedToken.freeBalanceOf(alice), 100e18);
+        assertEq(wrappedToken.availableBalanceOf(alice), 100e18);
 
         // is reduced by encumbrances
         wrappedToken.encumber(bob, 20e18);
         assertEq(wrappedToken.balanceOf(alice), 100e18);
-        assertEq(wrappedToken.freeBalanceOf(alice), 80e18);
+        assertEq(wrappedToken.availableBalanceOf(alice), 80e18);
 
         // is reduced by transfers
         wrappedToken.transfer(bob, 20e18);
         assertEq(wrappedToken.balanceOf(alice), 80e18);
-        assertEq(wrappedToken.freeBalanceOf(alice), 60e18);
+        assertEq(wrappedToken.availableBalanceOf(alice), 60e18);
 
         vm.stopPrank();
 
@@ -63,14 +63,14 @@ contract EncumberableTokenTest is Test {
         // is NOT reduced by transferFrom (from an encumbered address)
         wrappedToken.transferFrom(alice, charlie, 10e18);
         assertEq(wrappedToken.balanceOf(alice), 70e18);
-        assertEq(wrappedToken.freeBalanceOf(alice), 60e18);
+        assertEq(wrappedToken.availableBalanceOf(alice), 60e18);
         assertEq(wrappedToken.encumbrances(alice, bob), 10e18);
         assertEq(wrappedToken.balanceOf(charlie), 10e18);
 
         // is increased by a release
         wrappedToken.release(alice, 5e18);
         assertEq(wrappedToken.balanceOf(alice), 70e18);
-        assertEq(wrappedToken.freeBalanceOf(alice), 65e18);
+        assertEq(wrappedToken.availableBalanceOf(alice), 65e18);
         assertEq(wrappedToken.encumbrances(alice, bob), 5e18);
 
         vm.stopPrank();
@@ -84,7 +84,7 @@ contract EncumberableTokenTest is Test {
         wrappedToken.encumber(bob, 50e18);
 
         // alice attempts to transfer her entire balance
-        vm.expectRevert("ERC999: insufficient free balance");
+        vm.expectRevert("ERC999: insufficient available balance");
         wrappedToken.transfer(charlie, 100e18);
 
         vm.stopPrank();
@@ -97,8 +97,8 @@ contract EncumberableTokenTest is Test {
         // alice encumbers half her balance to bob
         wrappedToken.encumber(bob, 50e18);
 
-        // alice attempts to encumber more than her remaining free balance
-        vm.expectRevert("ERC999: insufficient free balance");
+        // alice attempts to encumber more than her remaining available balance
+        vm.expectRevert("ERC999: insufficient available balance");
         wrappedToken.encumber(charlie, 60e18);
 
         vm.stopPrank();
@@ -117,8 +117,8 @@ contract EncumberableTokenTest is Test {
 
         // balance is unchanged
         assertEq(wrappedToken.balanceOf(alice), 100e18);
-        // free balance is reduced
-        assertEq(wrappedToken.freeBalanceOf(alice), 40e18);
+        // available balance is reduced
+        assertEq(wrappedToken.availableBalanceOf(alice), 40e18);
 
         // creates encumbrance for taker
         assertEq(wrappedToken.encumbrances(alice, bob), 60e18);
@@ -135,7 +135,7 @@ contract EncumberableTokenTest is Test {
         wrappedToken.encumber(bob, 60e18);
 
         assertEq(wrappedToken.balanceOf(alice), 100e18);
-        assertEq(wrappedToken.freeBalanceOf(alice), 40e18);
+        assertEq(wrappedToken.availableBalanceOf(alice), 40e18);
         assertEq(wrappedToken.encumberedBalanceOf(alice), 60e18);
         assertEq(wrappedToken.encumbrances(alice, bob), 60e18);
         assertEq(wrappedToken.balanceOf(charlie), 0);
@@ -147,7 +147,7 @@ contract EncumberableTokenTest is Test {
         // alice balance is reduced
         assertEq(wrappedToken.balanceOf(alice), 60e18);
         // alice encumbrance to bob is reduced
-        assertEq(wrappedToken.freeBalanceOf(alice), 40e18);
+        assertEq(wrappedToken.availableBalanceOf(alice), 40e18);
         assertEq(wrappedToken.encumberedBalanceOf(alice), 20e18);
         assertEq(wrappedToken.encumbrances(alice, bob), 20e18);
         // transfer is completed
@@ -167,7 +167,7 @@ contract EncumberableTokenTest is Test {
         vm.stopPrank();
 
         assertEq(wrappedToken.balanceOf(alice), 100e18);
-        assertEq(wrappedToken.freeBalanceOf(alice), 80e18);
+        assertEq(wrappedToken.availableBalanceOf(alice), 80e18);
         assertEq(wrappedToken.encumberedBalanceOf(alice), 20e18);
         assertEq(wrappedToken.encumbrances(alice, bob), 20e18);
         assertEq(wrappedToken.allowance(alice, bob), 30e18);
@@ -181,7 +181,7 @@ contract EncumberableTokenTest is Test {
         assertEq(wrappedToken.balanceOf(alice), 60e18);
 
         // her encumbrance to bob has been fully spent
-        assertEq(wrappedToken.freeBalanceOf(alice), 60e18);
+        assertEq(wrappedToken.availableBalanceOf(alice), 60e18);
         assertEq(wrappedToken.encumberedBalanceOf(alice), 0);
         assertEq(wrappedToken.encumbrances(alice, bob), 0);
 
@@ -206,7 +206,7 @@ contract EncumberableTokenTest is Test {
         vm.stopPrank();
 
         assertEq(wrappedToken.balanceOf(alice), 100e18);
-        assertEq(wrappedToken.freeBalanceOf(alice), 90e18);
+        assertEq(wrappedToken.availableBalanceOf(alice), 90e18);
         assertEq(wrappedToken.encumberedBalanceOf(alice), 10e18);
         assertEq(wrappedToken.encumbrances(alice, bob), 10e18);
         assertEq(wrappedToken.allowance(alice, bob), 20e18);
@@ -239,7 +239,7 @@ contract EncumberableTokenTest is Test {
         wrappedToken.approve(bob, 100e18);
 
         assertEq(wrappedToken.balanceOf(alice), 100e18);
-        assertEq(wrappedToken.freeBalanceOf(alice), 100e18);
+        assertEq(wrappedToken.availableBalanceOf(alice), 100e18);
         assertEq(wrappedToken.encumberedBalanceOf(alice), 0e18);
         assertEq(wrappedToken.encumbrances(alice, bob), 0e18);
         assertEq(wrappedToken.allowance(alice, bob), 100e18);
@@ -255,8 +255,8 @@ contract EncumberableTokenTest is Test {
         // no balance is transferred
         assertEq(wrappedToken.balanceOf(alice), 100e18);
         assertEq(wrappedToken.balanceOf(charlie), 0);
-        // but free balance is reduced
-        assertEq(wrappedToken.freeBalanceOf(alice), 40e18);
+        // but available balance is reduced
+        assertEq(wrappedToken.availableBalanceOf(alice), 40e18);
         // encumbrance to charlie is created
         assertEq(wrappedToken.encumberedBalanceOf(alice), 60e18);
         assertEq(wrappedToken.encumbrances(alice, bob), 0e18);
@@ -274,7 +274,7 @@ contract EncumberableTokenTest is Test {
         wrappedToken.encumber(bob, 100e18);
 
         assertEq(wrappedToken.balanceOf(alice), 100e18);
-        assertEq(wrappedToken.freeBalanceOf(alice), 0);
+        assertEq(wrappedToken.availableBalanceOf(alice), 0);
         assertEq(wrappedToken.encumberedBalanceOf(alice), 100e18);
         assertEq(wrappedToken.encumbrances(alice, bob), 100e18);
 
@@ -286,7 +286,7 @@ contract EncumberableTokenTest is Test {
         wrappedToken.release(alice, 40e18);
 
         assertEq(wrappedToken.balanceOf(alice), 100e18);
-        assertEq(wrappedToken.freeBalanceOf(alice), 40e18);
+        assertEq(wrappedToken.availableBalanceOf(alice), 40e18);
         assertEq(wrappedToken.encumberedBalanceOf(alice), 60e18);
         assertEq(wrappedToken.encumbrances(alice, bob), 60e18);
     }
@@ -360,7 +360,7 @@ contract EncumberableTokenTest is Test {
         vm.stopPrank();
     }
 
-    function testBurnInsufficientFreeBalance() public {
+    function testBurnInsufficientAvailableBalance() public {
         // alice has a balance of the underlying token
         deal(address(underlyingToken), alice, 100e18);
 
@@ -381,7 +381,7 @@ contract EncumberableTokenTest is Test {
 
         // she encumbers her balance and then attempts to burn it
         wrappedToken.encumber(bob, 40e18);
-        vm.expectRevert("ERC999: burn amount exceeds free balance");
+        vm.expectRevert("ERC999: burn amount exceeds available balance");
         wrappedToken.burn(alice, 40e18);
 
         vm.stopPrank();

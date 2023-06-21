@@ -64,16 +64,16 @@ contract EncumberableToken is ERC20, IERC20Permit, IERC999 {
 
     /**
      * @notice Amount of an address's token balance that is not encumbered
-     * @param a Address to check the free balance of
+     * @param a Address to check the available balance of
      * @return uint Unencumbered balance
      */
-    function freeBalanceOf(address a) public view returns (uint) {
+    function availableBalanceOf(address a) public view returns (uint) {
         return (balanceOf(a) - encumberedBalanceOf[a]);
     }
 
     /**
      * @notice Moves `amount` tokens from the caller's account to `dst`
-     * @dev Confirms the free balance of the caller is sufficient to cover
+     * @dev Confirms the available balance of the caller is sufficient to cover
      * transfer
      * @param dst Address to transfer tokens to
      * @param amount Amount of token to transfer
@@ -81,7 +81,7 @@ contract EncumberableToken is ERC20, IERC20Permit, IERC999 {
      */
     function transfer(address dst, uint amount) public override returns (bool) {
         // check but dont spend encumbrance
-        require(freeBalanceOf(msg.sender) >= amount, "ERC999: insufficient free balance");
+        require(availableBalanceOf(msg.sender) >= amount, "ERC999: insufficient available balance");
         _transfer(msg.sender, dst, amount);
         return true;
     }
@@ -104,10 +104,10 @@ contract EncumberableToken is ERC20, IERC20Permit, IERC999 {
             _spendEncumbrance(src, msg.sender, encumberedToTaker);
 
             // Having spent all the tokens encumbered to the mover,
-            // We are now moving only "free" tokens and must check
+            // We are now moving only "available" tokens and must check
             // to not unfairly move tokens encumbered to others
 
-           require(freeBalanceOf(src) >= excessAmount, "insufficient balance");
+           require(availableBalanceOf(src) >= excessAmount, "insufficient balance");
 
             _spendAllowance(src, msg.sender, excessAmount);
         } else {
@@ -143,7 +143,7 @@ contract EncumberableToken is ERC20, IERC20Permit, IERC999 {
      * @dev Increase `owner`'s encumbrance to `taker` by `amount`
      */
     function _encumber(address owner, address taker, uint amount) private {
-        require(freeBalanceOf(owner) >= amount, "ERC999: insufficient free balance");
+        require(availableBalanceOf(owner) >= amount, "ERC999: insufficient available balance");
         encumbrances[owner][taker] += amount;
         encumberedBalanceOf[owner] += amount;
         emit Encumber(owner, taker, amount);
@@ -206,8 +206,8 @@ contract EncumberableToken is ERC20, IERC20Permit, IERC999 {
      * @param amount Number of tokens to burn
      */
     function burn(address recipient, uint amount) external {
-        uint freeBalance = freeBalanceOf(msg.sender);
-        require(freeBalance >= amount, "ERC999: burn amount exceeds free balance");
+        uint availableBalance = availableBalanceOf(msg.sender);
+        require(availableBalance >= amount, "ERC999: burn amount exceeds available balance");
         _burn(msg.sender, amount);
         doTransferOut(underlyingToken, recipient, amount);
     }

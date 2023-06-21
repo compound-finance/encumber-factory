@@ -72,4 +72,10 @@ interface IERC999 {
      * Emits a {Release} event.
      */
     function release(address owner, uint amount) external;
+
+    /**
+     * @dev Convenience function for reading the unencumbered balance of an address.
+     * Trivially implemented as `balanceOf(owner) - encumberedBalanceOf(owner)`
+     */
+    function availableBalanceOf(address owner) external returns (uint);
 }
