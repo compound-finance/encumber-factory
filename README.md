@@ -33,11 +33,28 @@ requires an ERC20-compatible token.
 
 ## Limitations
 
-The major limitation of the EncumberableTokenFactory is that it does not support
+### Rebasing tokens
+
+One major limitation of the EncumberableTokenFactory is that it does not support
 rebasing tokens.
 
 If you wrap a rebasing token and then mint the wrapped token, your rebasing
 interest will accumulate to the wrapper token.
+
+### Fee tokens
+
+Additionally, the EncumberableTokenFactory does not support fee tokens.
+
+The `doTransferIn` and `doTransferOut` functions assume that a succesful call of
+`ERC2(token).transferFrom(src, dst, amount)` will result in `amount` tokens
+being transferred to `dst`. Those functions do not verify the amount that has
+been transferred.
+
+If a token breaks this assumption (by having a fee on transfer, for example),
+then it is possible that a user would be able to drain the wrapper contract's
+balance of the underlying token by minting a greater amount of the wrapper token
+than they have actually transferred in, and then burning that greater amount for
+more of the underlying token than they transferred in.
 
 # Deployed addresses
 
