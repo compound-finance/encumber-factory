@@ -16,7 +16,7 @@ import "./interfaces/IERC999.sol";
  */
 contract EncumberableToken is ERC20, IERC20Permit, IERC999 {
     /// @notice The major version of this contract
-    string public constant version = "0";
+    string public constant version = "1";
 
     /// @dev The highest valid value for s in an ECDSA signature pair (0 < s < secp256k1n ÷ 2 + 1)
     ///  See https://ethereum.github.io/yellowpaper/paper.pdf #307)
