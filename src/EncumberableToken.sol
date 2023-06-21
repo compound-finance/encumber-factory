@@ -64,11 +64,11 @@ contract EncumberableToken is ERC20, IERC20Permit, IERC999 {
 
     /**
      * @notice Amount of an address's token balance that is not encumbered
-     * @param a Address to check the available balance of
+     * @param owner Address to check the available balance of
      * @return uint Unencumbered balance
      */
-    function availableBalanceOf(address a) public view returns (uint) {
-        return (balanceOf(a) - encumberedBalanceOf[a]);
+    function availableBalanceOf(address owner) public view returns (uint) {
+        return (balanceOf(owner) - encumberedBalanceOf[owner]);
     }
 
     /**
