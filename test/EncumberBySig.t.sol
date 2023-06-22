@@ -24,34 +24,43 @@ contract EncumberBySigTest is Test {
         alice = vm.addr(alicePrivateKey);
     }
 
-/*
     function aliceAuthorization(uint256 amount, uint256 nonce, uint256 expiry) internal view returns (uint8, bytes32, bytes32) {
-        bytes32 structHash = keccak256(abi.encode(AUTHORIZATION_TYPEHASH, alice, bob, amount, nonce, expiry));
+        bytes32 structHash = keccak256(abi.encode(ENCUMBER_TYPEHASH, alice, bob, amount, nonce, expiry));
         bytes32 digest = keccak256(abi.encodePacked("\x19\x01", wrappedToken.DOMAIN_SEPARATOR(), structHash));
         return vm.sign(alicePrivateKey, digest);
     }
 
-    function testPermit() public {
-        // bob's allowance from alice is 0
-        assertEq(wrappedToken.allowance(alice, bob), 0);
+    function testEncumberBySig() public {
+        uint aliceBalance = 100e18;
+        uint256 encumbranceAmount = 60e18;
 
-        uint256 allowance = 123e18;
+        // alice has 100 wrapped tokens
+        deal(address(wrappedToken), alice, aliceBalance);
+
+        assertEq(wrappedToken.balanceOf(alice), aliceBalance);
+        assertEq(wrappedToken.availableBalanceOf(alice), aliceBalance);
+        assertEq(wrappedToken.encumberedBalanceOf(alice), 0);
+        assertEq(wrappedToken.encumbrances(alice, bob), 0);
+
         uint nonce = wrappedToken.nonces(alice);
         uint expiry = block.timestamp + 1000;
 
-        (uint8 v, bytes32 r, bytes32 s) = aliceAuthorization(allowance, nonce, expiry);
+        (uint8 v, bytes32 r, bytes32 s) = aliceAuthorization(encumbranceAmount, nonce, expiry);
 
-        // bob calls permit with the signature
+        // bob calls encumberBySig with the signature
         vm.prank(bob);
-        wrappedToken.permit(alice, bob, allowance, expiry, v, r, s);
+        wrappedToken.encumberBySig(alice, bob, encumbranceAmount, expiry, v, r, s);
 
-        // bob's allowance from alice equals allowance
-        assertEq(wrappedToken.allowance(alice, bob), allowance);
+        assertEq(wrappedToken.balanceOf(alice), aliceBalance);
+        assertEq(wrappedToken.availableBalanceOf(alice), aliceBalance - encumbranceAmount);
+        assertEq(wrappedToken.encumberedBalanceOf(alice), encumbranceAmount);
+        assertEq(wrappedToken.encumbrances(alice, bob), encumbranceAmount);
 
         // alice's nonce is incremented
         assertEq(wrappedToken.nonces(alice), nonce + 1);
     }
 
+/*
     function testPermitRevertsForBadOwner() public {
         // bob's allowance from alice is 0
         assertEq(wrappedToken.allowance(alice, bob), 0);
@@ -275,4 +284,6 @@ contract EncumberBySigTest is Test {
         assertEq(wrappedToken.nonces(alice), nonce);
     }
 */
+
+    // XXX encumber for someone else; if you have an allowance, encumber part of that allowance to someone else
 }
