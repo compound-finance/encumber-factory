@@ -93,7 +93,7 @@ contract EncumberBySigTest is Test {
     }
 
 /*
-    function testPermitRevertsForBadSpender() public {
+    function testEncumberBySigRevertsForBadSpender() public {
         // bob's allowance from alice is 0
         assertEq(wrappedToken.allowance(alice, bob), 0);
 
@@ -101,12 +101,12 @@ contract EncumberBySigTest is Test {
         uint nonce = wrappedToken.nonces(alice);
         uint expiry = block.timestamp + 1000;
 
-        (uint8 v, bytes32 r, bytes32 s) = aliceAuthorization(allowance, nonce, expiry);
+        (uint8 v, bytes32 r, bytes32 s) = aliceAuthorization(encumbranceAmount, nonce, expiry);
 
-        // bob calls permit with the signature, but he manipulates the spender
+        // bob calls encumberBySig with the signature, but he manipulates the spender
         vm.prank(bob);
         vm.expectRevert("Bad signatory");
-        wrappedToken.permit(alice, charlie, allowance, expiry, v, r, s);
+        wrappedToken.encumberBySig(alice, charlie, allowance, expiry, v, r, s);
 
         // bob's allowance from alice is unchanged
         assertEq(wrappedToken.allowance(alice, bob), 0);
@@ -115,7 +115,7 @@ contract EncumberBySigTest is Test {
         assertEq(wrappedToken.nonces(alice), nonce);
     }
 
-    function testPermitRevertsForBadAmount() public {
+    function testEncumberBySigRevertsForBadAmount() public {
         // bob's allowance from alice is 0
         assertEq(wrappedToken.allowance(alice, bob), 0);
 
@@ -123,12 +123,12 @@ contract EncumberBySigTest is Test {
         uint nonce = wrappedToken.nonces(alice);
         uint expiry = block.timestamp + 1000;
 
-        (uint8 v, bytes32 r, bytes32 s) = aliceAuthorization(allowance, nonce, expiry);
+        (uint8 v, bytes32 r, bytes32 s) = aliceAuthorization(encumbranceAmount, nonce, expiry);
 
-        // bob calls permit with the signature, but he manipulates the allowance
+        // bob calls encumberBySig with the signature, but he manipulates the allowance
         vm.prank(bob);
         vm.expectRevert("Bad signatory");
-        wrappedToken.permit(alice, bob, allowance + 1 wei, expiry, v, r, s);
+        wrappedToken.encumberBySig(alice, bob, allowance + 1 wei, expiry, v, r, s);
 
         // bob's allowance from alice is unchanged
         assertEq(wrappedToken.allowance(alice, bob), 0);
@@ -137,7 +137,7 @@ contract EncumberBySigTest is Test {
         assertEq(wrappedToken.nonces(alice), nonce);
     }
 
-    function testPermitRevertsForBadExpiry() public {
+    function testEncumberBySigRevertsForBadExpiry() public {
         // bob's allowance from alice is 0
         assertEq(wrappedToken.allowance(alice, bob), 0);
 
@@ -145,12 +145,12 @@ contract EncumberBySigTest is Test {
         uint nonce = wrappedToken.nonces(alice);
         uint expiry = block.timestamp + 1000;
 
-        (uint8 v, bytes32 r, bytes32 s) = aliceAuthorization(allowance, nonce, expiry);
+        (uint8 v, bytes32 r, bytes32 s) = aliceAuthorization(encumbranceAmount, nonce, expiry);
 
-        // bob calls permit with the signature, but he manipulates the expiry
+        // bob calls encumberBySig with the signature, but he manipulates the expiry
         vm.prank(bob);
         vm.expectRevert("Bad signatory");
-        wrappedToken.permit(alice, bob, allowance, expiry + 1, v, r, s);
+        wrappedToken.encumberBySig(alice, bob, allowance, expiry + 1, v, r, s);
 
         // bob's allowance from alice is unchanged
         assertEq(wrappedToken.allowance(alice, bob), 0);
@@ -159,7 +159,7 @@ contract EncumberBySigTest is Test {
         assertEq(wrappedToken.nonces(alice), nonce);
     }
 
-    function testPermitRevertsForBadNonce() public {
+    function testEncumberBySigRevertsForBadNonce() public {
         // bob's allowance from alice is 0
         assertEq(wrappedToken.allowance(alice, bob), 0);
 
@@ -169,12 +169,12 @@ contract EncumberBySigTest is Test {
         uint badNonce = nonce + 1;
         uint expiry = block.timestamp + 1000;
 
-        (uint8 v, bytes32 r, bytes32 s) = aliceAuthorization(allowance, badNonce, expiry);
+        (uint8 v, bytes32 r, bytes32 s) = aliceAuthorization(encumbranceAmount, badNonce, expiry);
 
-        // bob calls permit with the signature, but he manipulates the expiry
+        // bob calls encumberBySig with the signature, but he manipulates the expiry
         vm.prank(bob);
         vm.expectRevert("Bad signatory");
-        wrappedToken.permit(alice, bob, allowance, expiry, v, r, s);
+        wrappedToken.encumberBySig(alice, bob, allowance, expiry, v, r, s);
 
         // bob's allowance from alice is unchanged
         assertEq(wrappedToken.allowance(alice, bob), 0);
@@ -183,7 +183,7 @@ contract EncumberBySigTest is Test {
         assertEq(wrappedToken.nonces(alice), nonce);
     }
 
-    function testPermitRevertsOnRepeatedCall() public {
+    function testEncumberBySigRevertsOnRepeatedCall() public {
         // bob's allowance from alice is 0
         assertEq(wrappedToken.allowance(alice, bob), 0);
 
@@ -191,11 +191,11 @@ contract EncumberBySigTest is Test {
         uint nonce = wrappedToken.nonces(alice);
         uint expiry = block.timestamp + 1000;
 
-        (uint8 v, bytes32 r, bytes32 s) = aliceAuthorization(allowance, nonce, expiry);
+        (uint8 v, bytes32 r, bytes32 s) = aliceAuthorization(encumbranceAmount, nonce, expiry);
 
-        // bob calls permit with the signature
+        // bob calls encumberBySig with the signature
         vm.prank(bob);
-        wrappedToken.permit(alice, bob, allowance, expiry, v, r, s);
+        wrappedToken.encumberBySig(alice, bob, allowance, expiry, v, r, s);
 
         // bob's allowance from alice equals allowance
         assertEq(wrappedToken.allowance(alice, bob), allowance);
@@ -211,7 +211,7 @@ contract EncumberBySigTest is Test {
         // bob tries to reuse the same signature twice
         vm.prank(bob);
         vm.expectRevert("Bad signatory");
-        wrappedToken.permit(alice, bob, allowance, expiry, v, r, s);
+        wrappedToken.encumberBySig(alice, bob, allowance, expiry, v, r, s);
 
 
         // bob's allowance from alice is unchanged
@@ -221,7 +221,7 @@ contract EncumberBySigTest is Test {
         assertEq(wrappedToken.nonces(alice), nonce + 1);
     }
 
-    function testPermitRevertsForExpiredSignature() public {
+    function testEncumberBySigRevertsForExpiredSignature() public {
         // bob's allowance from alice is 0
         assertEq(wrappedToken.allowance(alice, bob), 0);
 
@@ -229,15 +229,15 @@ contract EncumberBySigTest is Test {
         uint nonce = wrappedToken.nonces(alice);
         uint expiry = block.timestamp + 1000;
 
-        (uint8 v, bytes32 r, bytes32 s) = aliceAuthorization(allowance, nonce, expiry);
+        (uint8 v, bytes32 r, bytes32 s) = aliceAuthorization(encumbranceAmount, nonce, expiry);
 
         // the expiry block arrives
         vm.warp(expiry);
 
-        // bob calls permit with the signature, but he manipulates the expiry
+        // bob calls encumberBySig with the signature, but he manipulates the expiry
         vm.prank(bob);
         vm.expectRevert("Signature expired");
-        wrappedToken.permit(alice, bob, allowance, expiry, v, r, s);
+        wrappedToken.encumberBySig(alice, bob, allowance, expiry, v, r, s);
 
         // bob's allowance from alice is unchanged
         assertEq(wrappedToken.allowance(alice, bob), 0);
@@ -246,7 +246,7 @@ contract EncumberBySigTest is Test {
         assertEq(wrappedToken.nonces(alice), nonce);
     }
 
-    function testPermitRevertsInvalidV() public {
+    function testEncumberBySigRevertsInvalidV() public {
         // bob's allowance from alice is 0
         assertEq(wrappedToken.allowance(alice, bob), 0);
 
@@ -254,13 +254,13 @@ contract EncumberBySigTest is Test {
         uint nonce = wrappedToken.nonces(alice);
         uint expiry = block.timestamp + 1000;
 
-        (, bytes32 r, bytes32 s) = aliceAuthorization(allowance, nonce, expiry);
+        (, bytes32 r, bytes32 s) = aliceAuthorization(encumbranceAmount, nonce, expiry);
         uint8 invalidV = 26;
 
-        // bob calls permit with the signature, but he manipulates the expiry
+        // bob calls encumberBySig with the signature, but he manipulates the expiry
         vm.prank(bob);
         vm.expectRevert("Invalid value v");
-        wrappedToken.permit(alice, bob, allowance, expiry, invalidV, r, s);
+        wrappedToken.encumberBySig(alice, bob, allowance, expiry, invalidV, r, s);
 
         // bob's allowance from alice is unchanged
         assertEq(wrappedToken.allowance(alice, bob), 0);
@@ -269,7 +269,7 @@ contract EncumberBySigTest is Test {
         assertEq(wrappedToken.nonces(alice), nonce);
     }
 
-    function testPermitRevertsInvalidS() public {
+    function testEncumberBySigRevertsInvalidS() public {
         // bob's allowance from alice is 0
         assertEq(wrappedToken.allowance(alice, bob), 0);
 
@@ -277,15 +277,15 @@ contract EncumberBySigTest is Test {
         uint nonce = wrappedToken.nonces(alice);
         uint expiry = block.timestamp + 1000;
 
-        (uint8 v, bytes32 r, ) = aliceAuthorization(allowance, nonce, expiry);
+        (uint8 v, bytes32 r, ) = aliceAuthorization(encumbranceAmount, nonce, expiry);
 
         // 1 greater than the max value of s
         bytes32 invalidS = 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A1;
 
-        // bob calls permit with the signature, but he manipulates the expiry
+        // bob calls encumberBySig with the signature, but he manipulates the expiry
         vm.prank(bob);
         vm.expectRevert("Invalid value s");
-        wrappedToken.permit(alice, bob, allowance, expiry, v, r, invalidS);
+        wrappedToken.encumberBySig(alice, bob, allowance, expiry, v, r, invalidS);
 
         // bob's allowance from alice is unchanged
         assertEq(wrappedToken.allowance(alice, bob), 0);
