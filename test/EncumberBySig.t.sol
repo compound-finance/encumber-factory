@@ -60,29 +60,39 @@ contract EncumberBySigTest is Test {
         assertEq(wrappedToken.nonces(alice), nonce + 1);
     }
 
-/*
-    function testPermitRevertsForBadOwner() public {
-        // bob's allowance from alice is 0
-        assertEq(wrappedToken.allowance(alice, bob), 0);
+    function testEncumberBySigRevertsForBadOwner() public {
+        uint aliceBalance = 100e18;
+        uint256 encumbranceAmount = 60e18;
 
-        uint256 allowance = 123e18;
+        // alice has 100 wrapped tokens
+        deal(address(wrappedToken), alice, aliceBalance);
+
+        assertEq(wrappedToken.balanceOf(alice), aliceBalance);
+        assertEq(wrappedToken.availableBalanceOf(alice), aliceBalance);
+        assertEq(wrappedToken.encumberedBalanceOf(alice), 0);
+        assertEq(wrappedToken.encumbrances(alice, bob), 0);
+
         uint nonce = wrappedToken.nonces(alice);
         uint expiry = block.timestamp + 1000;
 
-        (uint8 v, bytes32 r, bytes32 s) = aliceAuthorization(allowance, nonce, expiry);
+        (uint8 v, bytes32 r, bytes32 s) = aliceAuthorization(encumbranceAmount, nonce, expiry);
 
-        // bob calls permit with the signature, but he manipulates the owner
+        // bob calls encumberBySig with the signature, but he manipulates the owner
         vm.prank(bob);
         vm.expectRevert("Bad signatory");
-        wrappedToken.permit(charlie, bob, allowance, expiry, v, r, s);
+        wrappedToken.encumberBySig(charlie, bob, encumbranceAmount, expiry, v, r, s);
 
-        // bob's allowance from alice is unchanged
-        assertEq(wrappedToken.allowance(alice, bob), 0);
+        // no encumbrance is created
+        assertEq(wrappedToken.balanceOf(alice), aliceBalance);
+        assertEq(wrappedToken.availableBalanceOf(alice), aliceBalance);
+        assertEq(wrappedToken.encumberedBalanceOf(alice), 0);
+        assertEq(wrappedToken.encumbrances(alice, bob), 0);
 
         // alice's nonce is not incremented
         assertEq(wrappedToken.nonces(alice), nonce);
     }
 
+/*
     function testPermitRevertsForBadSpender() public {
         // bob's allowance from alice is 0
         assertEq(wrappedToken.allowance(alice, bob), 0);
