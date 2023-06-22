@@ -6,7 +6,7 @@ import "../src/erc20/IERC20Metadata.sol";
 import "../src/EncumberableToken.sol";
 import "../src/erc20/ERC20.sol";
 
-contract PermiTest is Test {
+contract PermitTest is Test {
     ERC20 public underlyingToken;
     EncumberableToken public wrappedToken;
 
