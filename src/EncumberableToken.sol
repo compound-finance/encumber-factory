@@ -249,8 +249,8 @@ contract EncumberableToken is ERC20, IERC20Permit, IERC999 {
         require(signatory != address(0), 'Bad signatory');
         require(owner == signatory, 'Bad signatory');
         require(block.timestamp < expiry, 'Signature expired');
-        _approve(owner, spender, amount);
         nonces[signatory]++;
+        _approve(owner, spender, amount);
     }
 
     /**
