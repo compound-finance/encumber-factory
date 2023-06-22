@@ -35,8 +35,8 @@ contract PermitTest is Test {
         assertEq(wrappedToken.allowance(alice, bob), 0);
 
         uint256 allowance = 123e18;
-        uint nonce = wrappedToken.nonces(alice);
-        uint expiry = block.timestamp + 1000;
+        uint256 nonce = wrappedToken.nonces(alice);
+        uint256 expiry = block.timestamp + 1000;
 
         (uint8 v, bytes32 r, bytes32 s) = aliceAuthorization(allowance, nonce, expiry);
 
@@ -56,8 +56,8 @@ contract PermitTest is Test {
         assertEq(wrappedToken.allowance(alice, bob), 0);
 
         uint256 allowance = 123e18;
-        uint nonce = wrappedToken.nonces(alice);
-        uint expiry = block.timestamp + 1000;
+        uint256 nonce = wrappedToken.nonces(alice);
+        uint256 expiry = block.timestamp + 1000;
 
         (uint8 v, bytes32 r, bytes32 s) = aliceAuthorization(allowance, nonce, expiry);
 
@@ -78,8 +78,8 @@ contract PermitTest is Test {
         assertEq(wrappedToken.allowance(alice, bob), 0);
 
         uint256 allowance = 123e18;
-        uint nonce = wrappedToken.nonces(alice);
-        uint expiry = block.timestamp + 1000;
+        uint256 nonce = wrappedToken.nonces(alice);
+        uint256 expiry = block.timestamp + 1000;
 
         (uint8 v, bytes32 r, bytes32 s) = aliceAuthorization(allowance, nonce, expiry);
 
@@ -100,8 +100,8 @@ contract PermitTest is Test {
         assertEq(wrappedToken.allowance(alice, bob), 0);
 
         uint256 allowance = 123e18;
-        uint nonce = wrappedToken.nonces(alice);
-        uint expiry = block.timestamp + 1000;
+        uint256 nonce = wrappedToken.nonces(alice);
+        uint256 expiry = block.timestamp + 1000;
 
         (uint8 v, bytes32 r, bytes32 s) = aliceAuthorization(allowance, nonce, expiry);
 
@@ -122,8 +122,8 @@ contract PermitTest is Test {
         assertEq(wrappedToken.allowance(alice, bob), 0);
 
         uint256 allowance = 123e18;
-        uint nonce = wrappedToken.nonces(alice);
-        uint expiry = block.timestamp + 1000;
+        uint256 nonce = wrappedToken.nonces(alice);
+        uint256 expiry = block.timestamp + 1000;
 
         (uint8 v, bytes32 r, bytes32 s) = aliceAuthorization(allowance, nonce, expiry);
 
@@ -145,9 +145,9 @@ contract PermitTest is Test {
 
         // alice signs an authorization with an invalid nonce
         uint256 allowance = 123e18;
-        uint nonce = wrappedToken.nonces(alice);
-        uint badNonce = nonce + 1;
-        uint expiry = block.timestamp + 1000;
+        uint256 nonce = wrappedToken.nonces(alice);
+        uint256 badNonce = nonce + 1;
+        uint256 expiry = block.timestamp + 1000;
 
         (uint8 v, bytes32 r, bytes32 s) = aliceAuthorization(allowance, badNonce, expiry);
 
@@ -168,8 +168,8 @@ contract PermitTest is Test {
         assertEq(wrappedToken.allowance(alice, bob), 0);
 
         uint256 allowance = 123e18;
-        uint nonce = wrappedToken.nonces(alice);
-        uint expiry = block.timestamp + 1000;
+        uint256 nonce = wrappedToken.nonces(alice);
+        uint256 expiry = block.timestamp + 1000;
 
         (uint8 v, bytes32 r, bytes32 s) = aliceAuthorization(allowance, nonce, expiry);
 
@@ -205,8 +205,8 @@ contract PermitTest is Test {
         assertEq(wrappedToken.allowance(alice, bob), 0);
 
         uint256 allowance = 123e18;
-        uint nonce = wrappedToken.nonces(alice);
-        uint expiry = block.timestamp + 1000;
+        uint256 nonce = wrappedToken.nonces(alice);
+        uint256 expiry = block.timestamp + 1000;
 
         (uint8 v, bytes32 r, bytes32 s) = aliceAuthorization(allowance, nonce, expiry);
 
@@ -230,8 +230,8 @@ contract PermitTest is Test {
         assertEq(wrappedToken.allowance(alice, bob), 0);
 
         uint256 allowance = 123e18;
-        uint nonce = wrappedToken.nonces(alice);
-        uint expiry = block.timestamp + 1000;
+        uint256 nonce = wrappedToken.nonces(alice);
+        uint256 expiry = block.timestamp + 1000;
 
         (, bytes32 r, bytes32 s) = aliceAuthorization(allowance, nonce, expiry);
         uint8 invalidV = 26;
@@ -253,8 +253,8 @@ contract PermitTest is Test {
         assertEq(wrappedToken.allowance(alice, bob), 0);
 
         uint256 allowance = 123e18;
-        uint nonce = wrappedToken.nonces(alice);
-        uint expiry = block.timestamp + 1000;
+        uint256 nonce = wrappedToken.nonces(alice);
+        uint256 expiry = block.timestamp + 1000;
 
         (uint8 v, bytes32 r, ) = aliceAuthorization(allowance, nonce, expiry);
 

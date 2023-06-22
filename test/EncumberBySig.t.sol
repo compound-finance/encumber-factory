@@ -31,7 +31,7 @@ contract EncumberBySigTest is Test {
     }
 
     function testEncumberBySig() public {
-        uint aliceBalance = 100e18;
+        uint256 aliceBalance = 100e18;
         uint256 encumbranceAmount = 60e18;
 
         // alice has 100 wrapped tokens
@@ -42,8 +42,8 @@ contract EncumberBySigTest is Test {
         assertEq(wrappedToken.encumberedBalanceOf(alice), 0);
         assertEq(wrappedToken.encumbrances(alice, bob), 0);
 
-        uint nonce = wrappedToken.nonces(alice);
-        uint expiry = block.timestamp + 1000;
+        uint256 nonce = wrappedToken.nonces(alice);
+        uint256 expiry = block.timestamp + 1000;
 
         (uint8 v, bytes32 r, bytes32 s) = aliceAuthorization(encumbranceAmount, nonce, expiry);
 
@@ -61,7 +61,7 @@ contract EncumberBySigTest is Test {
     }
 
     function testEncumberBySigRevertsForBadOwner() public {
-        uint aliceBalance = 100e18;
+        uint256 aliceBalance = 100e18;
         uint256 encumbranceAmount = 60e18;
 
         // alice has 100 wrapped tokens
@@ -72,8 +72,8 @@ contract EncumberBySigTest is Test {
         assertEq(wrappedToken.encumberedBalanceOf(alice), 0);
         assertEq(wrappedToken.encumbrances(alice, bob), 0);
 
-        uint nonce = wrappedToken.nonces(alice);
-        uint expiry = block.timestamp + 1000;
+        uint256 nonce = wrappedToken.nonces(alice);
+        uint256 expiry = block.timestamp + 1000;
 
         (uint8 v, bytes32 r, bytes32 s) = aliceAuthorization(encumbranceAmount, nonce, expiry);
 
@@ -93,7 +93,7 @@ contract EncumberBySigTest is Test {
     }
 
     function testEncumberBySigRevertsForBadSpender() public {
-        uint aliceBalance = 100e18;
+        uint256 aliceBalance = 100e18;
         uint256 encumbranceAmount = 60e18;
 
         // alice has 100 wrapped tokens
@@ -104,8 +104,8 @@ contract EncumberBySigTest is Test {
         assertEq(wrappedToken.encumberedBalanceOf(alice), 0);
         assertEq(wrappedToken.encumbrances(alice, bob), 0);
 
-        uint nonce = wrappedToken.nonces(alice);
-        uint expiry = block.timestamp + 1000;
+        uint256 nonce = wrappedToken.nonces(alice);
+        uint256 expiry = block.timestamp + 1000;
 
         (uint8 v, bytes32 r, bytes32 s) = aliceAuthorization(encumbranceAmount, nonce, expiry);
 
@@ -125,7 +125,7 @@ contract EncumberBySigTest is Test {
     }
 
     function testEncumberBySigRevertsForBadAmount() public {
-        uint aliceBalance = 100e18;
+        uint256 aliceBalance = 100e18;
         uint256 encumbranceAmount = 60e18;
 
         // alice has 100 wrapped tokens
@@ -136,8 +136,8 @@ contract EncumberBySigTest is Test {
         assertEq(wrappedToken.encumberedBalanceOf(alice), 0);
         assertEq(wrappedToken.encumbrances(alice, bob), 0);
 
-        uint nonce = wrappedToken.nonces(alice);
-        uint expiry = block.timestamp + 1000;
+        uint256 nonce = wrappedToken.nonces(alice);
+        uint256 expiry = block.timestamp + 1000;
 
         (uint8 v, bytes32 r, bytes32 s) = aliceAuthorization(encumbranceAmount, nonce, expiry);
 
@@ -157,7 +157,7 @@ contract EncumberBySigTest is Test {
     }
 
     function testEncumberBySigRevertsForBadExpiry() public {
-        uint aliceBalance = 100e18;
+        uint256 aliceBalance = 100e18;
         uint256 encumbranceAmount = 60e18;
 
         // alice has 100 wrapped tokens
@@ -168,8 +168,8 @@ contract EncumberBySigTest is Test {
         assertEq(wrappedToken.encumberedBalanceOf(alice), 0);
         assertEq(wrappedToken.encumbrances(alice, bob), 0);
 
-        uint nonce = wrappedToken.nonces(alice);
-        uint expiry = block.timestamp + 1000;
+        uint256 nonce = wrappedToken.nonces(alice);
+        uint256 expiry = block.timestamp + 1000;
 
         (uint8 v, bytes32 r, bytes32 s) = aliceAuthorization(encumbranceAmount, nonce, expiry);
 
@@ -189,7 +189,7 @@ contract EncumberBySigTest is Test {
     }
 
     function testEncumberBySigRevertsForBadNonce() public {
-        uint aliceBalance = 100e18;
+        uint256 aliceBalance = 100e18;
         uint256 encumbranceAmount = 60e18;
 
         // alice has 100 wrapped tokens
@@ -201,9 +201,9 @@ contract EncumberBySigTest is Test {
         assertEq(wrappedToken.encumbrances(alice, bob), 0);
 
         // alice signs an authorization with an invalid nonce
-        uint nonce = wrappedToken.nonces(alice);
-        uint badNonce = nonce + 1;
-        uint expiry = block.timestamp + 1000;
+        uint256 nonce = wrappedToken.nonces(alice);
+        uint256 badNonce = nonce + 1;
+        uint256 expiry = block.timestamp + 1000;
 
         (uint8 v, bytes32 r, bytes32 s) = aliceAuthorization(encumbranceAmount, badNonce, expiry);
 
@@ -235,8 +235,8 @@ contract EncumberBySigTest is Test {
         assertEq(wrappedToken.encumberedBalanceOf(alice), 0);
         assertEq(wrappedToken.encumbrances(alice, bob), 0);
 
-        uint nonce = wrappedToken.nonces(alice);
-        uint expiry = block.timestamp + 1000;
+        uint256 nonce = wrappedToken.nonces(alice);
+        uint256 expiry = block.timestamp + 1000;
 
         (uint8 v, bytes32 r, bytes32 s) = aliceAuthorization(encumbranceAmount, nonce, expiry);
 
@@ -278,7 +278,7 @@ contract EncumberBySigTest is Test {
     }
 
     function testEncumberBySigRevertsForExpiredSignature() public {
-        uint aliceBalance = 100e18;
+        uint256 aliceBalance = 100e18;
         uint256 encumbranceAmount = 60e18;
 
         // alice has 100 wrapped tokens
@@ -289,8 +289,8 @@ contract EncumberBySigTest is Test {
         assertEq(wrappedToken.encumberedBalanceOf(alice), 0);
         assertEq(wrappedToken.encumbrances(alice, bob), 0);
 
-        uint nonce = wrappedToken.nonces(alice);
-        uint expiry = block.timestamp + 1000;
+        uint256 nonce = wrappedToken.nonces(alice);
+        uint256 expiry = block.timestamp + 1000;
 
         (uint8 v, bytes32 r, bytes32 s) = aliceAuthorization(encumbranceAmount, nonce, expiry);
 
@@ -313,7 +313,7 @@ contract EncumberBySigTest is Test {
     }
 
     function testEncumberBySigRevertsInvalidV() public {
-        uint aliceBalance = 100e18;
+        uint256 aliceBalance = 100e18;
         uint256 encumbranceAmount = 60e18;
 
         // alice has 100 wrapped tokens
@@ -324,8 +324,8 @@ contract EncumberBySigTest is Test {
         assertEq(wrappedToken.encumberedBalanceOf(alice), 0);
         assertEq(wrappedToken.encumbrances(alice, bob), 0);
 
-        uint nonce = wrappedToken.nonces(alice);
-        uint expiry = block.timestamp + 1000;
+        uint256 nonce = wrappedToken.nonces(alice);
+        uint256 expiry = block.timestamp + 1000;
 
         (, bytes32 r, bytes32 s) = aliceAuthorization(encumbranceAmount, nonce, expiry);
         uint8 invalidV = 26;
@@ -346,7 +346,7 @@ contract EncumberBySigTest is Test {
     }
 
     function testEncumberBySigRevertsInvalidS() public {
-        uint aliceBalance = 100e18;
+        uint256 aliceBalance = 100e18;
         uint256 encumbranceAmount = 60e18;
 
         // alice has 100 wrapped tokens
@@ -357,8 +357,8 @@ contract EncumberBySigTest is Test {
         assertEq(wrappedToken.encumberedBalanceOf(alice), 0);
         assertEq(wrappedToken.encumbrances(alice, bob), 0);
 
-        uint nonce = wrappedToken.nonces(alice);
-        uint expiry = block.timestamp + 1000;
+        uint256 nonce = wrappedToken.nonces(alice);
+        uint256 expiry = block.timestamp + 1000;
 
         (uint8 v, bytes32 r, ) = aliceAuthorization(encumbranceAmount, nonce, expiry);
 
