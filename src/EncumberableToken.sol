@@ -25,6 +25,9 @@ contract EncumberableToken is ERC20, IERC20Permit, IERC999 {
     /// @dev The EIP-712 typehash for authorization via permit
     bytes32 internal constant AUTHORIZATION_TYPEHASH = keccak256("Authorization(address owner,address spender,uint256 amount,uint256 nonce,uint256 expiry)");
 
+    /// @dev The EIP-712 typehash for encumber via encumberBySig
+    bytes32 internal constant ENCUMBER_TYPEHASH = keccak256("Encumber(address owner,address taker,uint256 amount,uint256 nonce,uint256 expiry)");
+
     /// @dev The EIP-712 typehash for the contract's domain
     bytes32 internal constant DOMAIN_TYPEHASH = keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)");
 
@@ -251,6 +254,39 @@ contract EncumberableToken is ERC20, IERC20Permit, IERC999 {
         require(block.timestamp < expiry, 'Signature expired');
         nonces[signatory]++;
         _approve(owner, spender, amount);
+    }
+
+    /**
+     * @notice XXX
+     * @param owner XXX
+     * @param taker XXX
+     * @param amount XXX
+     * @param expiry Expiration time for the signature
+     * @param v The recovery byte of the signature
+     * @param r Half of the ECDSA signature pair
+     * @param s Half of the ECDSA signature pair
+     */
+    function encumberBySig(
+        address owner,
+        address taker,
+        uint256 amount,
+        uint256 expiry,
+        uint8 v,
+        bytes32 r,
+        bytes32 s
+    ) external {
+        require(uint256(s) <= MAX_VALID_ECDSA_S, "Invalid value s");
+        // v ∈ {27, 28} (source: https://ethereum.github.io/yellowpaper/paper.pdf #308)
+        require(v == 27 || v == 28, 'Invalid value v');
+        uint nonce = nonces[owner];
+        bytes32 structHash = keccak256(abi.encode(ENCUMBER_TYPEHASH, owner, taker, amount, nonce, expiry));
+        bytes32 digest = keccak256(abi.encodePacked("\x19\x01", DOMAIN_SEPARATOR(), structHash));
+        address signatory = ecrecover(digest, v, r, s);
+        require(signatory != address(0), 'Bad signatory');
+        require(owner == signatory, 'Bad signatory');
+        require(block.timestamp < expiry, 'Signature expired');
+        nonces[signatory]++;
+        _encumber(msg.sender, taker, amount);
     }
 
     /**
