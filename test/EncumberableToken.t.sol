@@ -291,14 +291,14 @@ contract EncumberableTokenTest is Test {
         assertEq(wrappedToken.encumbrances(alice, bob), 60e18);
     }
 
-    function testMint() public {
+    function testWrap() public {
         // alice has a balance of the underlying token
         deal(address(underlyingToken), alice, 100e18);
 
-        // she mints 40 wrapped tokens to bob
+        // she wraps 40 tokens to bob
         vm.startPrank(alice);
         underlyingToken.approve(address(wrappedToken), 100e18);
-        wrappedToken.mint(bob, 40e18);
+        wrappedToken.wrap(bob, 40e18);
         vm.stopPrank();
 
         // the underlying token has been transferred in from alice
@@ -312,16 +312,16 @@ contract EncumberableTokenTest is Test {
         assertEq(wrappedToken.totalSupply(), 40e18);
     }
 
-    function testMintRevert() public {
+    function testWrapRevert() public {
         // alice has a balance of the underlying token
         deal(address(underlyingToken), alice, 100e18);
 
-        // she mints more than she has in the underlying token
+        // she wraps more than she has in the underlying token
         vm.startPrank(alice);
         underlyingToken.approve(address(wrappedToken), type(uint256).max);
 
         vm.expectRevert("ERC20: transfer amount exceeds balance");
-        wrappedToken.mint(alice, 200e18);
+        wrappedToken.wrap(alice, 200e18);
         vm.stopPrank();
     }
 
@@ -329,10 +329,10 @@ contract EncumberableTokenTest is Test {
         // alice has a balance of the underlying token
         deal(address(underlyingToken), alice, 100e18);
 
-        // she mints 40 wrapped tokens to herself
+        // she wraps 40 tokens to herself
         vm.startPrank(alice);
         underlyingToken.approve(address(wrappedToken), 100e18);
-        wrappedToken.mint(alice, 40e18);
+        wrappedToken.wrap(alice, 40e18);
 
         // the underlying token has been transferred in from alice
         assertEq(underlyingToken.balanceOf(alice), 60e18);
@@ -364,10 +364,10 @@ contract EncumberableTokenTest is Test {
         // alice has a balance of the underlying token
         deal(address(underlyingToken), alice, 100e18);
 
-        // she mints 40 wrapped tokens to herself
+        // she wraps 40 tokens to herself
         vm.startPrank(alice);
         underlyingToken.approve(address(wrappedToken), 100e18);
-        wrappedToken.mint(alice, 40e18);
+        wrappedToken.wrap(alice, 40e18);
 
         // the underlying token has been transferred in from alice
         assertEq(underlyingToken.balanceOf(alice), 60e18);

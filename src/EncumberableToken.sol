@@ -194,7 +194,7 @@ contract EncumberableToken is ERC20, IERC20Permit, IERC999 {
      * @param recipient Address to mint tokens to
      * @param amount Number of tokens to mint
      */
-    function mint(address recipient, uint amount) external {
+    function wrap(address recipient, uint amount) external {
         doTransferIn(underlyingToken, msg.sender, amount);
         _mint(recipient, amount);
     }
