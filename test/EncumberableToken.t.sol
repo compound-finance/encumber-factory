@@ -2,9 +2,9 @@ pragma solidity ^0.8.15;
 
 import "forge-std/Test.sol";
 import "forge-std/StdUtils.sol";
-import "../src/erc20/IERC20Metadata.sol";
+import "../src/vendor/ERC20.sol";
+import "../src/vendor/IERC20Metadata.sol";
 import "../src/EncumberableToken.sol";
-import "../src/erc20/ERC20.sol";
 
 contract EncumberableTokenTest is Test {
     event Encumber(address indexed owner, address indexed taker, uint amount);

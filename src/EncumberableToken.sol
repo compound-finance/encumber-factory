@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.15;
 
-import "./erc20/ERC20.sol";
-import "./erc20/IERC20.sol";
-import "./erc20/IERC20Metadata.sol";
-import "./erc20/IERC20NonStandard.sol";
-import "./erc20/IERC20Permit.sol";
+import "./vendor/ERC20.sol";
+import "./vendor/IERC20.sol";
+import "./vendor/IERC20Metadata.sol";
+import "./vendor/IERC20Permit.sol";
+import "./interfaces/IERC20NonStandard.sol";
 import "./interfaces/IERC999.sol";
 
 /**
