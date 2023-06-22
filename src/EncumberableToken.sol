@@ -205,9 +205,9 @@ contract EncumberableToken is ERC20, IERC20Permit, IERC999 {
      * @param recipient Address to burn tokens to
      * @param amount Number of tokens to burn
      */
-    function burn(address recipient, uint amount) external {
+    function unwrap(address recipient, uint amount) external {
         uint availableBalance = availableBalanceOf(msg.sender);
-        require(availableBalance >= amount, "ERC999: burn amount exceeds available balance");
+        require(availableBalance >= amount, "ERC999: unwrap amount exceeds available balance");
         _burn(msg.sender, amount);
         doTransferOut(underlyingToken, recipient, amount);
     }

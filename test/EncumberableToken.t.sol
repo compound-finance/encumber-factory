@@ -325,7 +325,7 @@ contract EncumberableTokenTest is Test {
         vm.stopPrank();
     }
 
-    function testBurn() public {
+    function testUnwrap() public {
         // alice has a balance of the underlying token
         deal(address(underlyingToken), alice, 100e18);
 
@@ -344,8 +344,8 @@ contract EncumberableTokenTest is Test {
         // total supply is increased
         assertEq(wrappedToken.totalSupply(), 40e18);
 
-        // she burns 20 wrapped tokens
-        wrappedToken.burn(alice, 20e18);
+        // she unwraps 20 wrapped tokens
+        wrappedToken.unwrap(alice, 20e18);
 
         // alice's balance of the wrapped token is decreased
         assertEq(wrappedToken.balanceOf(alice), 20e18);
@@ -360,7 +360,7 @@ contract EncumberableTokenTest is Test {
         vm.stopPrank();
     }
 
-    function testBurnInsufficientAvailableBalance() public {
+    function testUnwrapInsufficientAvailableBalance() public {
         // alice has a balance of the underlying token
         deal(address(underlyingToken), alice, 100e18);
 
@@ -379,10 +379,10 @@ contract EncumberableTokenTest is Test {
         // total supply is increased
         assertEq(wrappedToken.totalSupply(), 40e18);
 
-        // she encumbers her balance and then attempts to burn it
+        // she encumbers her balance and then attempts to unwrap it
         wrappedToken.encumber(bob, 40e18);
-        vm.expectRevert("ERC999: burn amount exceeds available balance");
-        wrappedToken.burn(alice, 40e18);
+        vm.expectRevert("ERC999: unwrap amount exceeds available balance");
+        wrappedToken.unwrap(alice, 40e18);
 
         vm.stopPrank();
     }
