@@ -257,10 +257,10 @@ contract EncumberableToken is ERC20, IERC20Permit, IERC999 {
     }
 
     /**
-     * @notice XXX
-     * @param owner XXX
-     * @param taker XXX
-     * @param amount XXX
+     * @notice Sets an encumbrance from owner to taker via signature from signatory
+     * @param owner The address that signed the signature
+     * @param taker The address to create an encumbrance to
+     * @param amount Amount that owner is encumbering to taker
      * @param expiry Expiration time for the signature
      * @param v The recovery byte of the signature
      * @param r Half of the ECDSA signature pair
