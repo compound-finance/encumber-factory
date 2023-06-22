@@ -157,10 +157,17 @@ contract EncumberBySigTest is Test {
     }
 
     function testEncumberBySigRevertsForBadExpiry() public {
-        // bob's allowance from alice is 0
-        assertEq(wrappedToken.allowance(alice, bob), 0);
+        uint aliceBalance = 100e18;
+        uint256 encumbranceAmount = 60e18;
 
-        uint256 allowance = 123e18;
+        // alice has 100 wrapped tokens
+        deal(address(wrappedToken), alice, aliceBalance);
+
+        assertEq(wrappedToken.balanceOf(alice), aliceBalance);
+        assertEq(wrappedToken.availableBalanceOf(alice), aliceBalance);
+        assertEq(wrappedToken.encumberedBalanceOf(alice), 0);
+        assertEq(wrappedToken.encumbrances(alice, bob), 0);
+
         uint nonce = wrappedToken.nonces(alice);
         uint expiry = block.timestamp + 1000;
 
@@ -169,10 +176,13 @@ contract EncumberBySigTest is Test {
         // bob calls encumberBySig with the signature, but he manipulates the expiry
         vm.prank(bob);
         vm.expectRevert("Bad signatory");
-        wrappedToken.encumberBySig(alice, bob, allowance, expiry + 1, v, r, s);
+        wrappedToken.encumberBySig(alice, bob, encumbranceAmount, expiry + 1, v, r, s);
 
-        // bob's allowance from alice is unchanged
-        assertEq(wrappedToken.allowance(alice, bob), 0);
+        // no encumbrance is created
+        assertEq(wrappedToken.balanceOf(alice), aliceBalance);
+        assertEq(wrappedToken.availableBalanceOf(alice), aliceBalance);
+        assertEq(wrappedToken.encumberedBalanceOf(alice), 0);
+        assertEq(wrappedToken.encumbrances(alice, bob), 0);
 
         // alice's nonce is not incremented
         assertEq(wrappedToken.nonces(alice), nonce);
