@@ -84,7 +84,7 @@ contract EncumberableTokenTest is Test {
         wrappedToken.encumber(bob, 50e18);
 
         // alice attempts to transfer her entire balance
-        vm.expectRevert("ERC999: insufficient available balance");
+        vm.expectRevert("ERC7246: insufficient available balance");
         wrappedToken.transfer(charlie, 100e18);
 
         vm.stopPrank();
@@ -98,7 +98,7 @@ contract EncumberableTokenTest is Test {
         wrappedToken.encumber(bob, 50e18);
 
         // alice attempts to encumber more than her remaining available balance
-        vm.expectRevert("ERC999: insufficient available balance");
+        vm.expectRevert("ERC7246: insufficient available balance");
         wrappedToken.encumber(charlie, 60e18);
 
         vm.stopPrank();
@@ -227,7 +227,7 @@ contract EncumberableTokenTest is Test {
 
         // but bob tries to encumber more than his allowance
         vm.prank(bob);
-        vm.expectRevert("ERC999: insufficient allowance");
+        vm.expectRevert("ERC7246: insufficient allowance");
         wrappedToken.encumberFrom(alice, charlie, 60e18);
     }
 
@@ -381,7 +381,7 @@ contract EncumberableTokenTest is Test {
 
         // she encumbers her balance and then attempts to unwrap it
         wrappedToken.encumber(bob, 40e18);
-        vm.expectRevert("ERC999: unwrap amount exceeds available balance");
+        vm.expectRevert("ERC7246: unwrap amount exceeds available balance");
         wrappedToken.unwrap(alice, 40e18);
 
         vm.stopPrank();

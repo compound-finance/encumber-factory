@@ -6,7 +6,7 @@ import "./vendor/IERC20.sol";
 import "./vendor/IERC20Metadata.sol";
 import "./vendor/IERC20Permit.sol";
 import "./interfaces/IERC20NonStandard.sol";
-import "./interfaces/IERC999.sol";
+import "./interfaces/IERC7246.sol";
 
 /**
  * @title EncumberableToken
@@ -14,7 +14,7 @@ import "./interfaces/IERC999.sol";
  * with encumbrance capabilities
  * @author Compound
  */
-contract EncumberableToken is ERC20, IERC20Permit, IERC999 {
+contract EncumberableToken is ERC20, IERC20Permit, IERC7246 {
     /// @notice The major version of this contract
     string public constant version = "1";
 
@@ -84,7 +84,7 @@ contract EncumberableToken is ERC20, IERC20Permit, IERC999 {
      */
     function transfer(address dst, uint amount) public override returns (bool) {
         // check but dont spend encumbrance
-        require(availableBalanceOf(msg.sender) >= amount, "ERC999: insufficient available balance");
+        require(availableBalanceOf(msg.sender) >= amount, "ERC7246: insufficient available balance");
         _transfer(msg.sender, dst, amount);
         return true;
     }
@@ -146,7 +146,7 @@ contract EncumberableToken is ERC20, IERC20Permit, IERC999 {
      * @dev Increase `owner`'s encumbrance to `taker` by `amount`
      */
     function _encumber(address owner, address taker, uint amount) private {
-        require(availableBalanceOf(owner) >= amount, "ERC999: insufficient available balance");
+        require(availableBalanceOf(owner) >= amount, "ERC7246: insufficient available balance");
         encumbrances[owner][taker] += amount;
         encumberedBalanceOf[owner] += amount;
         emit Encumber(owner, taker, amount);
@@ -161,7 +161,7 @@ contract EncumberableToken is ERC20, IERC20Permit, IERC999 {
      * @param amount Amount of tokens to increase the encumbrance to `taker` by
      */
     function encumberFrom(address owner, address taker, uint amount) external {
-        require(allowance(owner, msg.sender) >= amount, "ERC999: insufficient allowance");
+        require(allowance(owner, msg.sender) >= amount, "ERC7246: insufficient allowance");
         // spend caller's allowance
         _spendAllowance(owner, msg.sender, amount);
         _encumber(owner, taker, amount);
@@ -210,7 +210,7 @@ contract EncumberableToken is ERC20, IERC20Permit, IERC999 {
      */
     function unwrap(address recipient, uint amount) external {
         uint availableBalance = availableBalanceOf(msg.sender);
-        require(availableBalance >= amount, "ERC999: unwrap amount exceeds available balance");
+        require(availableBalance >= amount, "ERC7246: unwrap amount exceeds available balance");
         _burn(msg.sender, amount);
         doTransferOut(underlyingToken, recipient, amount);
     }

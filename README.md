@@ -8,20 +8,21 @@
 This code is unaudited and in active development. Do not use in production.
 ```
 
-Compound Labs recently released the spec for [ERC999](), an addition to the
-ERC20 standard that allows token holders to "encumber" a portion of their token
+Compound Labs recently released the spec for
+[ERC7246](https://github.com/ethereum/EIPs/pull/7246), an addition to the ERC20
+standard that allows token holders to "encumber" a portion of their token
 balance to another address. Encumbering tokens lets the token holder guarantee
 that a portion of their tokens are not transferable, allowing them to use their
 tokens as collateral without having to transfer custody.
 
 In order to take advantage of this new capability, tokens can implement the
-ERC999 interface. However, many tokens will never implement this interface,
+ERC7246 interface. However, many tokens will never implement this interface,
 either because their contracts are immutable or because the development team is
-unaware of ERC999 or uninterested in incorporating it into their contract.
+unaware of ERC7246 or uninterested in incorporating it into their contract.
 
 This repo defines an EncumberableTokenFactory. The EncumberableTokenFactory
 takes in the address of an ERC20 token and creates a wrapper token that
-adds the ERC999 interface.
+adds the ERC7246 interface.
 
 This wrapped token is exchangeable one-to-one for the underlying token. The
 wrapped token can then be used in any situation that requires an encumberable
@@ -66,9 +67,8 @@ XXX coming soon
 
 # Using the wrapped token
 
-The EncumberableToken contract inherits all the functionality of the [IERC999
-interface](./src/interfaces/IERC999.sol), along with the [IERC999Extended
-interface](./src/interfaces/IERC999Extended.sol).
+The EncumberableToken contract inherits all the functionality of the [IERC7246
+interface](./src/interfaces/IERC7246.sol).
 
 Additionally, each token includes `mint` and `burn` functions.
 
