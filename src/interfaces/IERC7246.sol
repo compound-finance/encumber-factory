@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: BUSL-1.1
 
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.15;
 
 /**
- * @dev Interface of the ERC999 standard.
+ * @dev Interface of the ERC7246 standard.
  */
-interface IERC999 {
+interface IERC7246 {
     /**
      * @dev Emitted when `amount` tokens are encumbered from `owner` to `taker`.
      */

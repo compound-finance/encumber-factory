@@ -4,7 +4,7 @@ pragma solidity ^0.8.15;
 import "./EncumberableToken.sol";
 
 contract EncumberableTokenFactory {
-    bytes32 constant SALT = "EIP-999";
+    bytes32 constant SALT = "EIP-7246";
 
     function deploy(address underlyingToken) external returns (address) {
         EncumberableToken wrapper = createEncumberableToken(underlyingToken);
