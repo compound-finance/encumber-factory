@@ -218,6 +218,7 @@ contract EncumberableToken is ERC20, IERC20Permit, IERC999 {
     /**
      * @notice Returns the domain separator used in the encoding of the
      * signature for permit
+     * @return bytes32 The domain separator
      */
     function DOMAIN_SEPARATOR() public view returns (bytes32) {
         return keccak256(abi.encode(DOMAIN_TYPEHASH, keccak256(bytes(name())), keccak256(bytes(version)), block.chainid, address(this)));
