@@ -35,8 +35,8 @@ contract PermitTest is Test {
         assertEq(wrappedToken.allowance(alice, bob), 0);
 
         uint256 allowance = 123e18;
-        uint nonce = wrappedToken.nonces(alice);
-        uint expiry = block.timestamp + 1000;
+        uint256 nonce = wrappedToken.nonces(alice);
+        uint256 expiry = block.timestamp + 1000;
 
         (uint8 v, bytes32 r, bytes32 s) = aliceAuthorization(allowance, nonce, expiry);
 
@@ -56,8 +56,8 @@ contract PermitTest is Test {
         assertEq(wrappedToken.allowance(alice, bob), 0);
 
         uint256 allowance = 123e18;
-        uint nonce = wrappedToken.nonces(alice);
-        uint expiry = block.timestamp + 1000;
+        uint256 nonce = wrappedToken.nonces(alice);
+        uint256 expiry = block.timestamp + 1000;
 
         (uint8 v, bytes32 r, bytes32 s) = aliceAuthorization(allowance, nonce, expiry);
 
@@ -78,8 +78,8 @@ contract PermitTest is Test {
         assertEq(wrappedToken.allowance(alice, bob), 0);
 
         uint256 allowance = 123e18;
-        uint nonce = wrappedToken.nonces(alice);
-        uint expiry = block.timestamp + 1000;
+        uint256 nonce = wrappedToken.nonces(alice);
+        uint256 expiry = block.timestamp + 1000;
 
         (uint8 v, bytes32 r, bytes32 s) = aliceAuthorization(allowance, nonce, expiry);
 
@@ -100,8 +100,8 @@ contract PermitTest is Test {
         assertEq(wrappedToken.allowance(alice, bob), 0);
 
         uint256 allowance = 123e18;
-        uint nonce = wrappedToken.nonces(alice);
-        uint expiry = block.timestamp + 1000;
+        uint256 nonce = wrappedToken.nonces(alice);
+        uint256 expiry = block.timestamp + 1000;
 
         (uint8 v, bytes32 r, bytes32 s) = aliceAuthorization(allowance, nonce, expiry);
 
@@ -122,8 +122,8 @@ contract PermitTest is Test {
         assertEq(wrappedToken.allowance(alice, bob), 0);
 
         uint256 allowance = 123e18;
-        uint nonce = wrappedToken.nonces(alice);
-        uint expiry = block.timestamp + 1000;
+        uint256 nonce = wrappedToken.nonces(alice);
+        uint256 expiry = block.timestamp + 1000;
 
         (uint8 v, bytes32 r, bytes32 s) = aliceAuthorization(allowance, nonce, expiry);
 
@@ -145,13 +145,13 @@ contract PermitTest is Test {
 
         // alice signs an authorization with an invalid nonce
         uint256 allowance = 123e18;
-        uint nonce = wrappedToken.nonces(alice);
-        uint badNonce = nonce + 1;
-        uint expiry = block.timestamp + 1000;
+        uint256 nonce = wrappedToken.nonces(alice);
+        uint256 badNonce = nonce + 1;
+        uint256 expiry = block.timestamp + 1000;
 
         (uint8 v, bytes32 r, bytes32 s) = aliceAuthorization(allowance, badNonce, expiry);
 
-        // bob calls permit with the signature, but he manipulates the expiry
+        // bob calls permit with the signature with an invalid nonce
         vm.prank(bob);
         vm.expectRevert("Bad signatory");
         wrappedToken.permit(alice, bob, allowance, expiry, v, r, s);
@@ -168,8 +168,8 @@ contract PermitTest is Test {
         assertEq(wrappedToken.allowance(alice, bob), 0);
 
         uint256 allowance = 123e18;
-        uint nonce = wrappedToken.nonces(alice);
-        uint expiry = block.timestamp + 1000;
+        uint256 nonce = wrappedToken.nonces(alice);
+        uint256 expiry = block.timestamp + 1000;
 
         (uint8 v, bytes32 r, bytes32 s) = aliceAuthorization(allowance, nonce, expiry);
 
@@ -193,7 +193,6 @@ contract PermitTest is Test {
         vm.expectRevert("Bad signatory");
         wrappedToken.permit(alice, bob, allowance, expiry, v, r, s);
 
-
         // bob's allowance from alice is unchanged
         assertEq(wrappedToken.allowance(alice, bob), 0);
 
@@ -206,15 +205,15 @@ contract PermitTest is Test {
         assertEq(wrappedToken.allowance(alice, bob), 0);
 
         uint256 allowance = 123e18;
-        uint nonce = wrappedToken.nonces(alice);
-        uint expiry = block.timestamp + 1000;
+        uint256 nonce = wrappedToken.nonces(alice);
+        uint256 expiry = block.timestamp + 1000;
 
         (uint8 v, bytes32 r, bytes32 s) = aliceAuthorization(allowance, nonce, expiry);
 
         // the expiry block arrives
         vm.warp(expiry);
 
-        // bob calls permit with the signature, but he manipulates the expiry
+        // bob calls permit with the signature after the expiry
         vm.prank(bob);
         vm.expectRevert("Signature expired");
         wrappedToken.permit(alice, bob, allowance, expiry, v, r, s);
@@ -231,13 +230,13 @@ contract PermitTest is Test {
         assertEq(wrappedToken.allowance(alice, bob), 0);
 
         uint256 allowance = 123e18;
-        uint nonce = wrappedToken.nonces(alice);
-        uint expiry = block.timestamp + 1000;
+        uint256 nonce = wrappedToken.nonces(alice);
+        uint256 expiry = block.timestamp + 1000;
 
         (, bytes32 r, bytes32 s) = aliceAuthorization(allowance, nonce, expiry);
         uint8 invalidV = 26;
 
-        // bob calls permit with the signature, but he manipulates the expiry
+        // bob calls permit with the signature with invalid `v` value
         vm.prank(bob);
         vm.expectRevert("Invalid value v");
         wrappedToken.permit(alice, bob, allowance, expiry, invalidV, r, s);
@@ -254,15 +253,15 @@ contract PermitTest is Test {
         assertEq(wrappedToken.allowance(alice, bob), 0);
 
         uint256 allowance = 123e18;
-        uint nonce = wrappedToken.nonces(alice);
-        uint expiry = block.timestamp + 1000;
+        uint256 nonce = wrappedToken.nonces(alice);
+        uint256 expiry = block.timestamp + 1000;
 
         (uint8 v, bytes32 r, ) = aliceAuthorization(allowance, nonce, expiry);
 
         // 1 greater than the max value of s
         bytes32 invalidS = 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A1;
 
-        // bob calls permit with the signature, but he manipulates the expiry
+        // bob calls permit with the signature with invalid `s` value
         vm.prank(bob);
         vm.expectRevert("Invalid value s");
         wrappedToken.permit(alice, bob, allowance, expiry, v, r, invalidS);
