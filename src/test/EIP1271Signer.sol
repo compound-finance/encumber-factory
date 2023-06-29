@@ -41,7 +41,7 @@ contract EIP1271Signer {
         // these malleable signatures as well.
         //
         // Source OpenZeppelin
-        // https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/cryptography/ECDSA.sol
+        // https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/cryptography/ECDSA.sol
 
         if (uint256(s) > 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0) {
             revert("SignatureValidator#recoverSigner: invalid signature 's' value");
