@@ -254,6 +254,8 @@ contract EncumberableToken is ERC20, IERC20Permit, IERC7246 {
         if (isValidSignature(owner, digest, v, r, s)) {
             nonces[owner]++;
             _approve(owner, spender, amount);
+        } else {
+            revert("Bad signatory");
         }
     }
 
@@ -283,6 +285,8 @@ contract EncumberableToken is ERC20, IERC20Permit, IERC7246 {
         if (isValidSignature(owner, digest, v, r, s)) {
             nonces[owner]++;
             _encumber(owner, taker, amount);
+        } else {
+            revert("Bad signatory");
         }
     }
 
@@ -308,7 +312,7 @@ contract EncumberableToken is ERC20, IERC20Permit, IERC7246 {
             (bool success, bytes memory data) = signer.staticcall(
                 abi.encodeWithSelector(EIP1271_MAGIC_VALUE, digest, signature)
             );
-            require(success == true, "Call to verify signature failed");
+            require(success == true, "Call to verify EIP1271 signature failed");
             bytes4 returnValue = abi.decode(data, (bytes4));
             return returnValue == EIP1271_MAGIC_VALUE;
         } else {
