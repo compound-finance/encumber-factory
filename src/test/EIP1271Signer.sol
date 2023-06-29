@@ -21,7 +21,6 @@ contract EIP1271Signer {
     function recoverSigner(bytes32 messageHash, bytes memory signature) internal pure returns (address) {
         require(signature.length == 65, "SignatureValidator#recoverSigner: invalid signature length");
 
-        // Variables are not scoped in Solidity.
         bytes32 r;
         bytes32 s;
         uint8 v;

@@ -13,7 +13,7 @@ contract EncumberBySigTest is Test {
 
     uint256 alicePrivateKey = 0xa11ce;
     address alice; // see setup()
-    address aliceContract;
+    address aliceContract; // contract that can verify EIP1271 signatures
     address bob = address(11);
     address charlie = address(12);
 
