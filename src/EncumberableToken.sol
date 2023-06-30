@@ -31,6 +31,10 @@ contract EncumberableToken is ERC20, IERC20Permit, IERC7246 {
     /// @dev The EIP-712 typehash for the contract's domain
     bytes32 internal constant DOMAIN_TYPEHASH = keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)");
 
+    /// @dev The magic value that a contract's `isValidSignature(bytes32 hash, bytes signature)` function should return for a valid signature
+    ///  See https://eips.ethereum.org/EIPS/eip-1271
+    bytes4 internal constant EIP1271_MAGIC_VALUE = 0x1626ba7e;
+
     /// @notice Number of decimals used for the user represenation of the token
     uint8 private immutable _decimals;
 
@@ -243,18 +247,16 @@ contract EncumberableToken is ERC20, IERC20Permit, IERC7246 {
         bytes32 r,
         bytes32 s
     ) external {
-        require(uint256(s) <= MAX_VALID_ECDSA_S, "Invalid value s");
-        // v ∈ {27, 28} (source: https://ethereum.github.io/yellowpaper/paper.pdf #308)
-        require(v == 27 || v == 28, 'Invalid value v');
+        require(block.timestamp < expiry, "Signature expired");
         uint nonce = nonces[owner];
         bytes32 structHash = keccak256(abi.encode(AUTHORIZATION_TYPEHASH, owner, spender, amount, nonce, expiry));
         bytes32 digest = keccak256(abi.encodePacked("\x19\x01", DOMAIN_SEPARATOR(), structHash));
-        address signatory = ecrecover(digest, v, r, s);
-        require(signatory != address(0), 'Bad signatory');
-        require(owner == signatory, 'Bad signatory');
-        require(block.timestamp < expiry, 'Signature expired');
-        nonces[signatory]++;
-        _approve(owner, spender, amount);
+        if (isValidSignature(owner, digest, v, r, s)) {
+            nonces[owner]++;
+            _approve(owner, spender, amount);
+        } else {
+            revert("Bad signatory");
+        }
     }
 
     /**
@@ -276,18 +278,63 @@ contract EncumberableToken is ERC20, IERC20Permit, IERC7246 {
         bytes32 r,
         bytes32 s
     ) external {
-        require(uint256(s) <= MAX_VALID_ECDSA_S, "Invalid value s");
-        // v ∈ {27, 28} (source: https://ethereum.github.io/yellowpaper/paper.pdf #308)
-        require(v == 27 || v == 28, 'Invalid value v');
+        require(block.timestamp < expiry, "Signature expired");
         uint nonce = nonces[owner];
         bytes32 structHash = keccak256(abi.encode(ENCUMBER_TYPEHASH, owner, taker, amount, nonce, expiry));
         bytes32 digest = keccak256(abi.encodePacked("\x19\x01", DOMAIN_SEPARATOR(), structHash));
-        address signatory = ecrecover(digest, v, r, s);
-        require(signatory != address(0), 'Bad signatory');
-        require(owner == signatory, 'Bad signatory');
-        require(block.timestamp < expiry, 'Signature expired');
-        nonces[signatory]++;
-        _encumber(owner, taker, amount);
+        if (isValidSignature(owner, digest, v, r, s)) {
+            nonces[owner]++;
+            _encumber(owner, taker, amount);
+        } else {
+            revert("Bad signatory");
+        }
+    }
+
+    /**
+     * @notice Checks if a signature is valid
+     * @dev Supports EIP-1271 signatures for smart contracts
+     * @param signer The address that signed the signature
+     * @param digest The hashed message that is signed
+     * @param v The recovery byte of the signature
+     * @param r Half of the ECDSA signature pair
+     * @param s Half of the ECDSA signature pair
+     * @return bool Whether the signature is valid
+     */
+    function isValidSignature(
+        address signer,
+        bytes32 digest,
+        uint8 v,
+        bytes32 r,
+        bytes32 s
+    ) internal view returns (bool) {
+        if (hasCode(signer)) {
+            bytes memory signature = abi.encodePacked(r, s, v);
+            (bool success, bytes memory data) = signer.staticcall(
+                abi.encodeWithSelector(EIP1271_MAGIC_VALUE, digest, signature)
+            );
+            require(success == true, "Call to verify EIP1271 signature failed");
+            bytes4 returnValue = abi.decode(data, (bytes4));
+            return returnValue == EIP1271_MAGIC_VALUE;
+        } else {
+            require(uint256(s) <= MAX_VALID_ECDSA_S, "Invalid value s");
+            // v ∈ {27, 28} (source: https://ethereum.github.io/yellowpaper/paper.pdf #308)
+            require(v == 27 || v == 28, "Invalid value v");
+            address signatory = ecrecover(digest, v, r, s);
+            require(signatory != address(0), "Bad signatory");
+            require(signatory == signer, "Bad signatory");
+            return true;
+        }
+    }
+
+    /**
+     * @notice Checks if an address has code deployed to it
+     * @param addr The address to check
+     * @return bool Whether the address contains code
+     */
+    function hasCode(address addr) internal view returns (bool) {
+        uint256 size;
+        assembly { size := extcodesize(addr) }
+        return size > 0;
     }
 
     /**

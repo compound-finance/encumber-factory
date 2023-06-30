@@ -32,6 +32,10 @@ It is comparable to the way that Wrapped Ether (WETH) acts as a wrapper around
 ETH, providing users with the ability to make use of ETH in any context that
 requires an ERC20-compatible token.
 
+The wrapper token comes with [EIP-2612](https://eips.ethereum.org/EIPS/eip-2612)
+and [EIP-1271](https://eips.ethereum.org/EIPS/eip-1271) support to allow both EOAs
+and smart contracts to approve and encumber gaslessly using off-chain signatures.
+
 ## Limitations
 
 ### Rebasing tokens
