@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BUSL-1.1
-pragma solidity ^0.8.15;
+pragma solidity ^0.8.20;
 
 contract EIP1271Signer {
     bytes4 internal constant EIP1271_MAGIC_VALUE = 0x1626ba7e;
