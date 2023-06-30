@@ -1,11 +1,11 @@
 pragma solidity ^0.8.15;
 
-import "forge-std/Test.sol";
 import "forge-std/StdUtils.sol";
-import "../src/vendor/ERC20.sol";
-import "../src/vendor/IERC20Metadata.sol";
-import "../src/EncumberableToken.sol";
-import "../src/test/EIP1271Signer.sol";
+import { Test } from "forge-std/Test.sol";
+import { ERC20 } from "../src/vendor/ERC20.sol";
+import { IERC20Metadata } from "../src/vendor/IERC20Metadata.sol";
+import { EncumberableToken } from "../src/EncumberableToken.sol";
+import { EIP1271Signer } from "../src/test/EIP1271Signer.sol";
 
 contract PermitTest is Test {
     ERC20 public underlyingToken;

@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.15;
 
-import "./vendor/ERC20.sol";
-import "./vendor/IERC20Metadata.sol";
-import "./vendor/IERC20Permit.sol";
-import "./interfaces/IERC20NonStandard.sol";
-import "./interfaces/IERC7246.sol";
+import { ERC20 } from "./vendor/ERC20.sol";
+import { IERC20Metadata } from "./vendor/IERC20Metadata.sol";
+import { IERC20Permit } from "./vendor/IERC20Permit.sol";
+import { IERC20NonStandard } from "./interfaces/IERC20NonStandard.sol";
+import { IERC7246 } from "./interfaces/IERC7246.sol";
 
 /**
  * @title EncumberableToken
