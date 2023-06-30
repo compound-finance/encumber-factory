@@ -1,12 +1,11 @@
 // SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.20;
 
-import "./vendor/ERC20.sol";
-import "./vendor/IERC20.sol";
-import "./vendor/IERC20Metadata.sol";
-import "./vendor/IERC20Permit.sol";
-import "./interfaces/IERC20NonStandard.sol";
-import "./interfaces/IERC7246.sol";
+import { ERC20 } from "./vendor/ERC20.sol";
+import { IERC20Metadata } from "./vendor/IERC20Metadata.sol";
+import { IERC20Permit } from "./vendor/IERC20Permit.sol";
+import { IERC20NonStandard } from "./interfaces/IERC20NonStandard.sol";
+import { IERC7246 } from "./interfaces/IERC7246.sol";
 
 /**
  * @title EncumberableToken
@@ -16,11 +15,11 @@ import "./interfaces/IERC7246.sol";
  */
 contract EncumberableToken is ERC20, IERC20Permit, IERC7246 {
     /// @notice The major version of this contract
-    string public constant version = "1";
+    string public constant VERSION = "1";
 
     /// @dev The highest valid value for s in an ECDSA signature pair (0 < s < secp256k1n ÷ 2 + 1)
     ///  See https://ethereum.github.io/yellowpaper/paper.pdf #307)
-    uint internal constant MAX_VALID_ECDSA_S = 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0;
+    uint256 internal constant MAX_VALID_ECDSA_S = 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0;
 
     /// @dev The EIP-712 typehash for authorization via permit
     bytes32 internal constant AUTHORIZATION_TYPEHASH = keccak256("Authorization(address owner,address spender,uint256 amount,uint256 nonce,uint256 expiry)");
@@ -42,13 +41,13 @@ contract EncumberableToken is ERC20, IERC20Permit, IERC7246 {
     address public immutable underlyingToken;
 
     /// @notice The next expected nonce for an address, for validating authorizations via signature
-    mapping(address => uint) public nonces;
+    mapping(address => uint256) public nonces;
 
     /// @notice Amount of an address's token balance that is encumbered
-    mapping (address => uint) public encumberedBalanceOf;
+    mapping (address => uint256) public encumberedBalanceOf;
 
     /// @notice Amount encumbered from owner to taker (owner => taker => balance)
-    mapping (address => mapping (address => uint)) public encumbrances;
+    mapping (address => mapping (address => uint256)) public encumbrances;
 
     /**
      * @notice Construct a new wrapper instance
@@ -72,9 +71,9 @@ contract EncumberableToken is ERC20, IERC20Permit, IERC7246 {
     /**
      * @notice Amount of an address's token balance that is not encumbered
      * @param owner Address to check the available balance of
-     * @return uint Unencumbered balance
+     * @return uint256 Unencumbered balance
      */
-    function availableBalanceOf(address owner) public view returns (uint) {
+    function availableBalanceOf(address owner) public view returns (uint256) {
         return (balanceOf(owner) - encumberedBalanceOf[owner]);
     }
 
@@ -86,7 +85,7 @@ contract EncumberableToken is ERC20, IERC20Permit, IERC7246 {
      * @param amount Amount of token to transfer
      * @return bool Whether the operation was successful
      */
-    function transfer(address dst, uint amount) public override returns (bool) {
+    function transfer(address dst, uint256 amount) public override returns (bool) {
         // check but dont spend encumbrance
         require(availableBalanceOf(msg.sender) >= amount, "ERC7246: insufficient available balance");
         _transfer(msg.sender, dst, amount);
@@ -103,10 +102,10 @@ contract EncumberableToken is ERC20, IERC20Permit, IERC7246 {
      * @param amount Amount of token to transfer
      * @return bool Whether the operation was successful
      */
-    function transferFrom(address src, address dst, uint amount) public override returns (bool) {
-        uint encumberedToTaker = encumbrances[src][msg.sender];
+    function transferFrom(address src, address dst, uint256 amount) public override returns (bool) {
+        uint256 encumberedToTaker = encumbrances[src][msg.sender];
         if (amount > encumberedToTaker)  {
-            uint excessAmount = amount - encumberedToTaker;
+            uint256 excessAmount = amount - encumberedToTaker;
             // Exceeds Encumbrance, so spend all of it
             _spendEncumbrance(src, msg.sender, encumberedToTaker);
 
@@ -128,10 +127,10 @@ contract EncumberableToken is ERC20, IERC20Permit, IERC7246 {
     /**
      * @dev Spend `amount` of `owner`'s encumbrance to `taker`
      */
-    function _spendEncumbrance(address owner, address taker, uint amount) internal {
-        uint currentEncumbrance = encumbrances[owner][taker];
+    function _spendEncumbrance(address owner, address taker, uint256 amount) internal {
+        uint256 currentEncumbrance = encumbrances[owner][taker];
         require(currentEncumbrance >= amount, "insufficient encumbrance");
-        uint newEncumbrance = currentEncumbrance - amount;
+        uint256 newEncumbrance = currentEncumbrance - amount;
         encumbrances[owner][taker] = newEncumbrance;
         encumberedBalanceOf[owner] -= amount;
     }
@@ -142,14 +141,14 @@ contract EncumberableToken is ERC20, IERC20Permit, IERC7246 {
      * @param taker Address to increase encumbrance to
      * @param amount Amount of tokens to increase the encumbrance by
      */
-    function encumber(address taker, uint amount) external {
+    function encumber(address taker, uint256 amount) external {
         _encumber(msg.sender, taker, amount);
     }
 
     /**
      * @dev Increase `owner`'s encumbrance to `taker` by `amount`
      */
-    function _encumber(address owner, address taker, uint amount) private {
+    function _encumber(address owner, address taker, uint256 amount) private {
         require(availableBalanceOf(owner) >= amount, "ERC7246: insufficient available balance");
         encumbrances[owner][taker] += amount;
         encumberedBalanceOf[owner] += amount;
@@ -164,7 +163,7 @@ contract EncumberableToken is ERC20, IERC20Permit, IERC7246 {
      * @param taker Address to increase encumbrance to
      * @param amount Amount of tokens to increase the encumbrance to `taker` by
      */
-    function encumberFrom(address owner, address taker, uint amount) external {
+    function encumberFrom(address owner, address taker, uint256 amount) external {
         require(allowance(owner, msg.sender) >= amount, "ERC7246: insufficient allowance");
         // spend caller's allowance
         _spendAllowance(owner, msg.sender, amount);
@@ -179,14 +178,14 @@ contract EncumberableToken is ERC20, IERC20Permit, IERC7246 {
      * @param owner Address to decrease encumbrance from
      * @param amount Amount of tokens to decrease the encumbrance by
      */
-    function release(address owner, uint amount) external {
+    function release(address owner, uint256 amount) external {
         _release(owner, msg.sender, amount);
     }
 
     /**
      * @dev Reduce `owner`'s encumbrance to `taker` by `amount`
      */
-    function _release(address owner, address taker, uint amount) private {
+    function _release(address owner, address taker, uint256 amount) private {
         if (encumbrances[owner][taker] < amount) {
           amount = encumbrances[owner][taker];
         }
@@ -201,7 +200,7 @@ contract EncumberableToken is ERC20, IERC20Permit, IERC7246 {
      * @param recipient Address to mint tokens to
      * @param amount Number of tokens to mint
      */
-    function wrap(address recipient, uint amount) external {
+    function wrap(address recipient, uint256 amount) external {
         doTransferIn(underlyingToken, msg.sender, amount);
         _mint(recipient, amount);
     }
@@ -212,8 +211,8 @@ contract EncumberableToken is ERC20, IERC20Permit, IERC7246 {
      * @param recipient Address to burn tokens to
      * @param amount Number of tokens to burn
      */
-    function unwrap(address recipient, uint amount) external {
-        uint availableBalance = availableBalanceOf(msg.sender);
+    function unwrap(address recipient, uint256 amount) external {
+        uint256 availableBalance = availableBalanceOf(msg.sender);
         require(availableBalance >= amount, "ERC7246: unwrap amount exceeds available balance");
         _burn(msg.sender, amount);
         doTransferOut(underlyingToken, recipient, amount);
@@ -225,7 +224,7 @@ contract EncumberableToken is ERC20, IERC20Permit, IERC7246 {
      * @return bytes32 The domain separator
      */
     function DOMAIN_SEPARATOR() public view returns (bytes32) {
-        return keccak256(abi.encode(DOMAIN_TYPEHASH, keccak256(bytes(name())), keccak256(bytes(version)), block.chainid, address(this)));
+        return keccak256(abi.encode(DOMAIN_TYPEHASH, keccak256(bytes(name())), keccak256(bytes(VERSION)), block.chainid, address(this)));
     }
 
     /**
@@ -248,7 +247,7 @@ contract EncumberableToken is ERC20, IERC20Permit, IERC7246 {
         bytes32 s
     ) external {
         require(block.timestamp < expiry, "Signature expired");
-        uint nonce = nonces[owner];
+        uint256 nonce = nonces[owner];
         bytes32 structHash = keccak256(abi.encode(AUTHORIZATION_TYPEHASH, owner, spender, amount, nonce, expiry));
         bytes32 digest = keccak256(abi.encodePacked("\x19\x01", DOMAIN_SEPARATOR(), structHash));
         if (isValidSignature(owner, digest, v, r, s)) {
@@ -279,7 +278,7 @@ contract EncumberableToken is ERC20, IERC20Permit, IERC7246 {
         bytes32 s
     ) external {
         require(block.timestamp < expiry, "Signature expired");
-        uint nonce = nonces[owner];
+        uint256 nonce = nonces[owner];
         bytes32 structHash = keccak256(abi.encode(ENCUMBER_TYPEHASH, owner, taker, amount, nonce, expiry));
         bytes32 digest = keccak256(abi.encodePacked("\x19\x01", DOMAIN_SEPARATOR(), structHash));
         if (isValidSignature(owner, digest, v, r, s)) {
@@ -345,7 +344,7 @@ contract EncumberableToken is ERC20, IERC20Permit, IERC7246 {
      * @dev Note: This does not check that the amount transferred in is actually equals to the amount specified (e.g. fee tokens will not revert)
      * @dev Note: This wrapper safely handles non-standard ERC-20 tokens that do not return a value. See here: https://medium.com/coinmonks/missing-return-value-bug-at-least-130-tokens-affected-d67bf08521ca
      */
-    function doTransferIn(address asset, address from, uint amount) internal {
+    function doTransferIn(address asset, address from, uint256 amount) internal {
         IERC20NonStandard(asset).transferFrom(from, address(this), amount);
 
         bool success;
@@ -372,7 +371,7 @@ contract EncumberableToken is ERC20, IERC20Permit, IERC7246 {
      * @param amount The amount of the token to transfer
      * @dev Note: This wrapper safely handles non-standard ERC-20 tokens that do not return a value. See here: https://medium.com/coinmonks/missing-return-value-bug-at-least-130-tokens-affected-d67bf08521ca
      */
-    function doTransferOut(address asset, address to, uint amount) internal {
+    function doTransferOut(address asset, address to, uint256 amount) internal {
         IERC20NonStandard(asset).transfer(to, amount);
 
         bool success;

@@ -9,13 +9,13 @@ interface IERC7246 {
     /**
      * @dev Emitted when `amount` tokens are encumbered from `owner` to `taker`.
      */
-    event Encumber(address indexed owner, address indexed taker, uint amount);
+    event Encumber(address indexed owner, address indexed taker, uint256 amount);
 
     /**
      * @dev Emitted when the encumbrance of a `taker` to an `owner` is reduced
      * by `amount`.
      */
-    event Release(address indexed owner, address indexed taker, uint amount);
+    event Release(address indexed owner, address indexed taker, uint256 amount);
 
     /**
      * @dev Returns the total amount of tokens owned by `owner` that are
@@ -24,7 +24,7 @@ interface IERC7246 {
      * Any function which would reduce balanceOf(owner) below
      * encumberedBalanceOf(owner) MUST revert
      */
-    function encumberedBalanceOf(address owner) external returns (uint);
+    function encumberedBalanceOf(address owner) external returns (uint256);
 
     /**
      * @dev Returns the number of tokens that `owner` has encumbered to `taker`.
@@ -34,7 +34,7 @@ interface IERC7246 {
      * This value decreases when {release} and {transferFrom} are called by
      * `taker`.
      */
-    function encumbrances(address owner, address taker) external returns (uint);
+    function encumbrances(address owner, address taker) external returns (uint256);
 
     /**
      * @dev Increases the amount of tokens that the caller has encumbered to
@@ -47,7 +47,7 @@ interface IERC7246 {
      *
      * Emits an {Encumber} event.
      */
-    function encumber(address taker, uint amount) external;
+    function encumber(address taker, uint256 amount) external;
 
     /**
      * @dev Increases the amount of tokens that `owner` has encumbered to
@@ -63,7 +63,7 @@ interface IERC7246 {
      *
      * Emits an {Encumber} event.
      */
-    function encumberFrom(address owner, address taker, uint amount) external;
+    function encumberFrom(address owner, address taker, uint256 amount) external;
 
     /**
      * @dev Reduces amount of tokens encumbered from `owner` to caller by
@@ -71,11 +71,11 @@ interface IERC7246 {
      *
      * Emits a {Release} event.
      */
-    function release(address owner, uint amount) external;
+    function release(address owner, uint256 amount) external;
 
     /**
      * @dev Convenience function for reading the unencumbered balance of an address.
      * Trivially implemented as `balanceOf(owner) - encumberedBalanceOf(owner)`
      */
-    function availableBalanceOf(address owner) external returns (uint);
+    function availableBalanceOf(address owner) external returns (uint256);
 }

@@ -1,10 +1,9 @@
 pragma solidity ^0.8.20;
 
-import "forge-std/Test.sol";
-import "../src/EncumberableTokenFactory.sol";
-import "../src/vendor/ERC20.sol";
-import "../src/vendor/IERC20Metadata.sol";
-
+import { Test } from "forge-std/Test.sol";
+import { EncumberableTokenFactory } from "../src/EncumberableTokenFactory.sol";
+import { ERC20 } from "../src/vendor/ERC20.sol";
+import { IERC20Metadata } from "../src/vendor/IERC20Metadata.sol";
 
 contract EncumberableTokenFactoryTest is Test {
     EncumberableTokenFactory public wrapperFactory;
