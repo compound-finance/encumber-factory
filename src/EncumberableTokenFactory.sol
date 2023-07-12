@@ -20,15 +20,8 @@ contract EncumberableTokenFactory {
      * @return address The address of the newly-deployed EncumberableToken wrapper contract
      */
     function deploy(address underlyingToken) external returns (address) {
-        EncumberableToken wrapper = createEncumberableToken(underlyingToken);
+        EncumberableToken wrapper = new EncumberableToken{salt: SALT}(underlyingToken);
         return address(wrapper);
-    }
-
-    /**
-     * @dev Deploy a new EncumberableToken wrapper for `underlyingToken`
-     */
-    function createEncumberableToken(address underlyingToken) internal returns (EncumberableToken) {
-        return new EncumberableToken{salt: SALT}(underlyingToken);
     }
 
     /**

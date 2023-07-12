@@ -34,7 +34,7 @@ contract EncumberableToken is ERC20, IERC20Permit, IERC7246 {
     ///  See https://eips.ethereum.org/EIPS/eip-1271
     bytes4 internal constant EIP1271_MAGIC_VALUE = 0x1626ba7e;
 
-    /// @notice Number of decimals used for the user represenation of the token
+    /// @notice Number of decimals used for the user representation of the token
     uint8 private immutable _decimals;
 
     /// @notice Address of the ERC20 token that this token wraps
