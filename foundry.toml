@@ -3,5 +3,8 @@ src = 'src'
 out = 'out'
 solc = '0.8.20'
 libs = ['lib']
+remappings = [
+  "@openzeppelin/=lib/openzeppelin-contracts/"
+]
 
 # See more config options https://github.com/foundry-rs/foundry/tree/master/config
