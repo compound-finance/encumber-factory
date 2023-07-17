@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: BSD-3-Clause
 pragma solidity ^0.8.20;
 
-import { ERC20 } from "./vendor/ERC20.sol";
-import { IERC20Metadata } from "./vendor/IERC20Metadata.sol";
-import { IERC20Permit } from "./vendor/IERC20Permit.sol";
+import { ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import { IERC20Metadata } from "@openzeppelin/contracts/interfaces/IERC20Metadata.sol";
+import { IERC20Permit } from "@openzeppelin/contracts/token/ERC20/extensions/IERC20Permit.sol";
 import { IERC20NonStandard } from "./interfaces/IERC20NonStandard.sol";
 import { IERC7246 } from "./interfaces/IERC7246.sol";
 
