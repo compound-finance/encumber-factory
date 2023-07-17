@@ -43,4 +43,16 @@ contract FeeTokenTest is Test {
         assertEq(feeToken.balanceOf(charlie), 99e18);
         assertEq(feeToken.balanceOf(address(feeToken)), 1e18);
     }
+
+    function testRevertOnTransferInWithFee() public {
+        deal(address(feeToken), alice, 100e18);
+
+        vm.startPrank(alice);
+        feeToken.approve(address(wrappedToken), 100e18);
+
+        vm.expectRevert("ERC7246: Insufficient amount transferred in");
+        wrappedToken.wrap(alice, 100e18);
+
+        vm.stopPrank();
+    }
 }
