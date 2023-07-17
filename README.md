@@ -48,18 +48,19 @@ interest will accumulate to the wrapper token.
 
 ### Fee tokens
 
-Additionally, the EncumberableTokenFactory does not support fee tokens.
+The EncumberableTokenFactory does not work for fee tokens.
 
-The `doTransferIn` and `doTransferOut` functions assume that a succesful call of
+If a token does not transfer the full amount requested during a `transfer` call
+(by having a fee on transfer, for example), then it is possible that a user
+would be able to drain the wrapper contract's balance of the underlying token by
+minting a greater amount of the wrapper token than they have actually
+transferred in, and then burning that greater amount for more of the underlying
+token than they transferred in.
+
+The `doTransferIn` function confirms that a successful call to
 `ERC2(token).transferFrom(src, dst, amount)` will result in `amount` tokens
-being transferred to `dst`. Those functions do not verify the amount that has
-been transferred.
-
-If a token breaks this assumption (by having a fee on transfer, for example),
-then it is possible that a user would be able to drain the wrapper contract's
-balance of the underlying token by minting a greater amount of the wrapper token
-than they have actually transferred in, and then burning that greater amount for
-more of the underlying token than they transferred in.
+being transferred to `dst`; if not, the call will revert. This should prevent
+minting a wrapped token whose underlying token takes a fee on transfer.
 
 # Deployed addresses
 
