@@ -6,6 +6,7 @@ import { IERC20Metadata } from "@openzeppelin/contracts/interfaces/IERC20Metadat
 import { IERC20Permit } from "@openzeppelin/contracts/token/ERC20/extensions/IERC20Permit.sol";
 import { IERC20NonStandard } from "./interfaces/IERC20NonStandard.sol";
 import { IERC7246 } from "./interfaces/IERC7246.sol";
+import { ECDSA } from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 
 /**
  * @title EncumberableToken
@@ -16,10 +17,6 @@ import { IERC7246 } from "./interfaces/IERC7246.sol";
 contract EncumberableToken is ERC20, IERC20Permit, IERC7246 {
     /// @notice The major version of this contract
     string public constant VERSION = "1";
-
-    /// @dev The highest valid value for s in an ECDSA signature pair (0 < s < secp256k1n ÷ 2 + 1)
-    ///  See https://ethereum.github.io/yellowpaper/paper.pdf #307)
-    uint256 internal constant MAX_VALID_ECDSA_S = 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0;
 
     /// @dev The EIP-712 typehash for authorization via permit
     bytes32 internal constant AUTHORIZATION_TYPEHASH = keccak256("Authorization(address owner,address spender,uint256 amount,uint256 nonce,uint256 expiry)");
@@ -315,12 +312,10 @@ contract EncumberableToken is ERC20, IERC20Permit, IERC7246 {
             bytes4 returnValue = abi.decode(data, (bytes4));
             return returnValue == EIP1271_MAGIC_VALUE;
         } else {
-            require(uint256(s) <= MAX_VALID_ECDSA_S, "Invalid value s");
-            // v ∈ {27, 28} (source: https://ethereum.github.io/yellowpaper/paper.pdf #308)
-            require(v == 27 || v == 28, "Invalid value v");
-            address signatory = ecrecover(digest, v, r, s);
-            require(signatory != address(0), "Bad signatory");
-            require(signatory == signer, "Bad signatory");
+            (address recoveredSigner, ECDSA.RecoverError recoverError) = ECDSA.tryRecover(digest, v, r, s);
+            require(recoverError != ECDSA.RecoverError.InvalidSignatureS, "Invalid value s");
+            require(recoverError != ECDSA.RecoverError.InvalidSignature, "Bad signatory");
+            require(recoveredSigner == signer, "Bad signatory");
             return true;
         }
     }
