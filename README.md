@@ -85,6 +85,22 @@ Alternatively, they can use the non-standard `increaseAllowance` and
 `decreaseAllowance` functions that are part of OpenZeppelin's ERC20
 implementation and are included in the EncumberableToken.
 
+## Considerations when integrating with encumberable tokens
+
+Tokens that implement the Encumbrance spec are ERC20 compatible, but they behave
+in slightly different ways than other ERC20s. These differences may be important
+to consider when writing a protocol or application that interacts with
+encumberable tokens.
+
+For example, an owner address might have a balance of an encumberable token and
+might grant an allowance to a spender address. But if that spender address
+attempts to transfer some of the owner's balance while the owner has an
+encumbrance on it, the transfer will fail.
+
+In this scenario, it is important to read the `availableBalanceOf` for the owner
+address; reading the owner's balance and the spender's allowance does not give
+a complete idea of how many tokens can be transferred.
+
 # Deployed addresses
 
 XXX coming soon
