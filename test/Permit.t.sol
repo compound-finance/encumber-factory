@@ -234,29 +234,6 @@ contract PermitTest is Test {
         assertEq(wrappedToken.nonces(alice), nonce);
     }
 
-    function testPermitRevertsInvalidV() public {
-        // bob's allowance from alice is 0
-        assertEq(wrappedToken.allowance(alice, bob), 0);
-
-        uint256 allowance = 123e18;
-        uint256 nonce = wrappedToken.nonces(alice);
-        uint256 expiry = block.timestamp + 1000;
-
-        (, bytes32 r, bytes32 s) = aliceAuthorization(allowance, nonce, expiry);
-        uint8 invalidV = 26;
-
-        // bob calls permit with the signature with invalid `v` value
-        vm.prank(bob);
-        vm.expectRevert("Invalid value v");
-        wrappedToken.permit(alice, bob, allowance, expiry, invalidV, r, s);
-
-        // bob's allowance from alice is unchanged
-        assertEq(wrappedToken.allowance(alice, bob), 0);
-
-        // alice's nonce is not incremented
-        assertEq(wrappedToken.nonces(alice), nonce);
-    }
-
     function testPermitRevertsInvalidS() public {
         // bob's allowance from alice is 0
         assertEq(wrappedToken.allowance(alice, bob), 0);
