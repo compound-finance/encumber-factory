@@ -10,6 +10,9 @@ import { EncumberableToken } from "./EncumberableToken.sol";
  * @author Compound
  */
 contract EncumberableTokenFactory {
+    /// @dev Emitted when new wrapper is deployed for `underlyingToken`
+    event DeployWrapper(address indexed underlyingToken, address indexed wrapperToken);
+
     /// @notice Salt to use when deploying contracts
     bytes32 internal constant SALT = "EIP-7246";
 
@@ -21,6 +24,7 @@ contract EncumberableTokenFactory {
      */
     function deploy(address underlyingToken) external returns (address) {
         EncumberableToken wrapper = new EncumberableToken{salt: SALT}(underlyingToken);
+        emit DeployWrapper(underlyingToken, address(wrapper));
         return address(wrapper);
     }
 
