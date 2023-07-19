@@ -66,7 +66,7 @@ more of the underlying token than they transferred in.
 The EncumberableToken contract is built on top of the standard ERC20 token, and
 therefore it inherits a [well-known flaw in the ERC20
 allowance](https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729)
-mechanism that can potentially allow someone to double-spend an allowance.
+mechanism that can potentially allow someone to double-spend an allowance in `transferFrom` and `encumberFrom`.
 
 The flaw works [like this](https://docs.google.com/document/d/1YLPtQxZu1UAvO9cZ1O2RPXBbT0mooh4DYKjA_jp-RLM/edit):
 
