@@ -61,6 +61,47 @@ balance of the underlying token by minting a greater amount of the wrapper token
 than they have actually transferred in, and then burning that greater amount for
 more of the underlying token than they transferred in.
 
+### ERC20 approve double-spend
+
+The EncumberableToken contract is built on top of the standard ERC20 token, and
+therefore it inherits a [well-known flaw in the ERC20
+allowance](https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729)
+mechanism that can potentially allow someone to double-spend an allowance in
+`transferFrom` and `encumberFrom`.
+
+The flaw works [like this](https://docs.google.com/document/d/1YLPtQxZu1UAvO9cZ1O2RPXBbT0mooh4DYKjA_jp-RLM/edit):
+
+- Alice grants an approval to Bob for X tokens by calling `token.approve(Bob, X)`
+- Alice decides to reduce Bob's allowance to a smaller number Y, and submits a
+transaction calling `token.approve(Bob, Y)`
+- Bob sees Alice's pending transaction before it is mined and quickly sends a
+transaction to transfer X tokens to himself, spending his existing allowance
+- Alice's transaction is mined, granting Bob the new allowance of Y
+- Bob sends a second transaction, transferring Y tokens to himself
+
+To mitigate this issue, users that wish to reduce an allowance can first set
+that allowance to 0, and then set the allowance to the desired new allowance.
+
+Alternatively, they can use the non-standard `increaseAllowance` and
+`decreaseAllowance` functions that are part of OpenZeppelin's ERC20
+implementation and are included in the EncumberableToken.
+
+## Considerations when integrating with encumberable tokens
+
+Tokens that implement the Encumbrance spec are ERC20 compatible, but they behave
+in slightly different ways than other ERC20s. These differences may be important
+to consider when writing a protocol or application that interacts with
+encumberable tokens.
+
+For example, an owner address might have a balance of an encumberable token and
+might grant an allowance to a spender address. But if that spender address
+attempts to transfer some of the owner's balance while the owner has an
+encumbrance on it, the transfer will fail.
+
+In this scenario, it is important to read the `availableBalanceOf` for the owner
+address; reading the owner's balance and the spender's allowance does not give
+a complete idea of how many tokens can be transferred.
+
 # Deployed addresses
 
 XXX coming soon
