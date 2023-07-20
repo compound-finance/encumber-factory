@@ -6,6 +6,8 @@ import { ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import { IERC20Metadata } from "@openzeppelin/contracts/interfaces/IERC20Metadata.sol";
 
 contract EncumberableTokenFactoryTest is Test {
+    event DeployWrapper(address indexed underlyingToken, address indexed wrapperToken);
+
     EncumberableTokenFactory public wrapperFactory;
     ERC20 public erc20;
     address public wrappedToken;
@@ -14,6 +16,16 @@ contract EncumberableTokenFactoryTest is Test {
         wrapperFactory = new EncumberableTokenFactory();
         erc20 = new ERC20("TEST TOKEN", "TTKN");
         wrappedToken = wrapperFactory.deploy(address(erc20));
+    }
+
+    function testEmittedEvent() public {
+        ERC20 underlyingToken = new ERC20("Underlying Token", "UTKN");
+        vm.expectEmit(true, true, true, true);
+        emit DeployWrapper(
+            address(underlyingToken),
+            wrapperFactory.getDeploymentAddress(address(underlyingToken))
+        );
+        wrapperFactory.deploy(address(underlyingToken));
     }
 
     function testWrappedName() public {
