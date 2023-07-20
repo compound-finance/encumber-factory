@@ -10,7 +10,7 @@ import { EncumberableToken } from "./EncumberableToken.sol";
  * @author Compound
  */
 contract EncumberableTokenFactory {
-    /// @dev Emitted when new wrapper is deployed for `underlyingToken`
+    /// @dev Emitted when a new wrapper is deployed for `underlyingToken`
     event DeployWrapper(address indexed underlyingToken, address indexed wrapperToken);
 
     /// @notice Salt to use when deploying contracts
