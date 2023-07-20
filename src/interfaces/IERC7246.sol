@@ -24,7 +24,7 @@ interface IERC7246 {
      * Any function which would reduce balanceOf(owner) below
      * encumberedBalanceOf(owner) MUST revert
      */
-    function encumberedBalanceOf(address owner) external returns (uint256);
+    function encumberedBalanceOf(address owner) external view returns (uint256);
 
     /**
      * @dev Returns the number of tokens that `owner` has encumbered to `taker`.
@@ -34,7 +34,7 @@ interface IERC7246 {
      * This value decreases when {release} and {transferFrom} are called by
      * `taker`.
      */
-    function encumbrances(address owner, address taker) external returns (uint256);
+    function encumbrances(address owner, address taker) external view returns (uint256);
 
     /**
      * @dev Increases the amount of tokens that the caller has encumbered to
@@ -77,5 +77,5 @@ interface IERC7246 {
      * @dev Convenience function for reading the unencumbered balance of an address.
      * Trivially implemented as `balanceOf(owner) - encumberedBalanceOf(owner)`
      */
-    function availableBalanceOf(address owner) external returns (uint256);
+    function availableBalanceOf(address owner) external view returns (uint256);
 }
