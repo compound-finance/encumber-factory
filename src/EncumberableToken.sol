@@ -336,10 +336,12 @@ contract EncumberableToken is ERC20, IERC20Permit, IERC7246 {
      * @param asset The ERC-20 token to transfer in
      * @param from The address to transfer from
      * @param amount The amount of the token to transfer
-     * @dev Note: This does not check that the amount transferred in is actually equals to the amount specified (e.g. fee tokens will not revert)
+     * @dev Note: This function checks that the amount transferred in equals the amount specified (e.g. fee tokens will revert)
      * @dev Note: This wrapper safely handles non-standard ERC-20 tokens that do not return a value. See here: https://medium.com/coinmonks/missing-return-value-bug-at-least-130-tokens-affected-d67bf08521ca
      */
     function doTransferIn(address asset, address from, uint256 amount) internal {
+        uint256 preTransferBalance = ERC20(asset).balanceOf(address(this));
+
         IERC20NonStandard(asset).transferFrom(from, address(this), amount);
 
         bool success;
@@ -357,6 +359,9 @@ contract EncumberableToken is ERC20, IERC20Permit, IERC7246 {
                 }
         }
         require(success, "Transfer in failed");
+
+        uint256 postTransferBalance = ERC20(asset).balanceOf(address(this));
+        require(postTransferBalance == preTransferBalance + amount, "ERC7246: Insufficient amount transferred in");
     }
 
     /**
