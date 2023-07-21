@@ -88,7 +88,7 @@ contract EncumberBySigTest is Test {
 
         // bob calls encumberBySig with the signature, but he manipulates the owner
         vm.prank(bob);
-        vm.expectRevert("Bad signatory");
+        vm.expectRevert("ERC7246: bad signatory");
         wrappedToken.encumberBySig(charlie, bob, encumbranceAmount, expiry, v, r, s);
 
         // no encumbrance is created
@@ -120,7 +120,7 @@ contract EncumberBySigTest is Test {
 
         // bob calls encumberBySig with the signature, but he manipulates the spender
         vm.prank(bob);
-        vm.expectRevert("Bad signatory");
+        vm.expectRevert("ERC7246: bad signatory");
         wrappedToken.encumberBySig(alice, charlie, encumbranceAmount, expiry, v, r, s);
 
         // no encumbrance is created
@@ -152,7 +152,7 @@ contract EncumberBySigTest is Test {
 
         // bob calls encumberBySig with the signature, but he manipulates the encumbranceAmount
         vm.prank(bob);
-        vm.expectRevert("Bad signatory");
+        vm.expectRevert("ERC7246: bad signatory");
         wrappedToken.encumberBySig(alice, bob, encumbranceAmount + 1 wei, expiry, v, r, s);
 
         // no encumbrance is created
@@ -184,7 +184,7 @@ contract EncumberBySigTest is Test {
 
         // bob calls encumberBySig with the signature, but he manipulates the expiry
         vm.prank(bob);
-        vm.expectRevert("Bad signatory");
+        vm.expectRevert("ERC7246: bad signatory");
         wrappedToken.encumberBySig(alice, bob, encumbranceAmount, expiry + 1, v, r, s);
 
         // no encumbrance is created
@@ -218,7 +218,7 @@ contract EncumberBySigTest is Test {
 
         // bob calls encumberBySig with the signature with an invalid nonce
         vm.prank(bob);
-        vm.expectRevert("Bad signatory");
+        vm.expectRevert("ERC7246: bad signatory");
         wrappedToken.encumberBySig(alice, bob, encumbranceAmount, expiry, v, r, s);
 
         // no encumbrance is created
@@ -271,7 +271,7 @@ contract EncumberBySigTest is Test {
         assertEq(wrappedToken.encumbrances(alice, bob), encumbranceAmount - transferAmount);
 
         // bob tries to reuse the same signature twice
-        vm.expectRevert("Bad signatory");
+        vm.expectRevert("ERC7246: bad signatory");
         wrappedToken.encumberBySig(alice, bob, encumbranceAmount, expiry, v, r, s);
 
         // no new encumbrance is created
@@ -308,7 +308,7 @@ contract EncumberBySigTest is Test {
 
         // bob calls encumberBySig with the signature after the expiry
         vm.prank(bob);
-        vm.expectRevert("Signature expired");
+        vm.expectRevert("ERC7246: signature expired");
         wrappedToken.encumberBySig(alice, bob, encumbranceAmount, expiry, v, r, s);
 
         // no encumbrance is created
@@ -343,7 +343,7 @@ contract EncumberBySigTest is Test {
 
         // bob calls encumberBySig with the signature, but he manipulates the expiry
         vm.prank(bob);
-        vm.expectRevert("Invalid value s");
+        vm.expectRevert("ERC7246: invalid value s");
         wrappedToken.encumberBySig(alice, bob, encumbranceAmount, expiry, v, r, invalidS);
 
         // no encumbrance is created
@@ -407,7 +407,7 @@ contract EncumberBySigTest is Test {
 
         // bob calls encumberBySig with the signature, but he manipulates the spender
         vm.prank(bob);
-        vm.expectRevert("Bad signatory");
+        vm.expectRevert("ERC7246: bad signatory");
         wrappedToken.encumberBySig(aliceContract, charlie, encumbranceAmount, expiry, v, r, s);
 
         // no encumbrance is created
@@ -439,7 +439,7 @@ contract EncumberBySigTest is Test {
 
         // bob calls encumberBySig with the signature, but he manipulates the encumbranceAmount
         vm.prank(bob);
-        vm.expectRevert("Bad signatory");
+        vm.expectRevert("ERC7246: bad signatory");
         wrappedToken.encumberBySig(aliceContract, bob, encumbranceAmount + 1 wei, expiry, v, r, s);
 
         // no encumbrance is created
@@ -471,7 +471,7 @@ contract EncumberBySigTest is Test {
 
         // bob calls encumberBySig with the signature, but he manipulates the expiry
         vm.prank(bob);
-        vm.expectRevert("Bad signatory");
+        vm.expectRevert("ERC7246: bad signatory");
         wrappedToken.encumberBySig(aliceContract, bob, encumbranceAmount, expiry + 1, v, r, s);
 
         // no encumbrance is created
@@ -505,7 +505,7 @@ contract EncumberBySigTest is Test {
 
         // bob calls encumberBySig with the signature with an invalid nonce
         vm.prank(bob);
-        vm.expectRevert("Bad signatory");
+        vm.expectRevert("ERC7246: bad signatory");
         wrappedToken.encumberBySig(aliceContract, bob, encumbranceAmount, expiry, v, r, s);
 
         // no encumbrance is created
@@ -558,7 +558,7 @@ contract EncumberBySigTest is Test {
         assertEq(wrappedToken.encumbrances(aliceContract, bob), encumbranceAmount - transferAmount);
 
         // bob tries to reuse the same signature twice
-        vm.expectRevert("Bad signatory");
+        vm.expectRevert("ERC7246: bad signatory");
         wrappedToken.encumberBySig(aliceContract, bob, encumbranceAmount, expiry, v, r, s);
 
         // no new encumbrance is created
@@ -595,7 +595,7 @@ contract EncumberBySigTest is Test {
 
         // bob calls encumberBySig with the signature after the expiry
         vm.prank(bob);
-        vm.expectRevert("Signature expired");
+        vm.expectRevert("ERC7246: signature expired");
         wrappedToken.encumberBySig(aliceContract, bob, encumbranceAmount, expiry, v, r, s);
 
         // no encumbrance is created
@@ -628,7 +628,7 @@ contract EncumberBySigTest is Test {
 
         // bob calls encumberBySig with the signature with an invalid `v` value
         vm.prank(bob);
-        vm.expectRevert("Call to verify EIP1271 signature failed");
+        vm.expectRevert("ERC7246: call to verify EIP1271 signature failed");
         wrappedToken.encumberBySig(aliceContract, bob, encumbranceAmount, expiry, invalidV, r, s);
 
         // no encumbrance is created
@@ -663,7 +663,7 @@ contract EncumberBySigTest is Test {
 
         // bob calls encumberBySig with the signature, but he manipulates the expiry
         vm.prank(bob);
-        vm.expectRevert("Call to verify EIP1271 signature failed");
+        vm.expectRevert("ERC7246: call to verify EIP1271 signature failed");
         wrappedToken.encumberBySig(aliceContract, bob, encumbranceAmount, expiry, v, r, invalidS);
 
         // no encumbrance is created

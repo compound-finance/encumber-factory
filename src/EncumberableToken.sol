@@ -110,7 +110,7 @@ contract EncumberableToken is ERC20, IERC20Permit, IERC7246 {
             // We are now moving only "available" tokens and must check
             // to not unfairly move tokens encumbered to others
 
-           require(availableBalanceOf(src) >= excessAmount, "insufficient balance");
+           require(availableBalanceOf(src) >= excessAmount, "ERC7246: insufficient balance");
 
             _spendAllowance(src, msg.sender, excessAmount);
         } else {
@@ -126,7 +126,7 @@ contract EncumberableToken is ERC20, IERC20Permit, IERC7246 {
      */
     function _spendEncumbrance(address owner, address taker, uint256 amount) internal {
         uint256 currentEncumbrance = encumbrances[owner][taker];
-        require(currentEncumbrance >= amount, "insufficient encumbrance");
+        require(currentEncumbrance >= amount, "ERC7246: insufficient encumbrance");
         uint256 newEncumbrance = currentEncumbrance - amount;
         encumbrances[owner][taker] = newEncumbrance;
         encumberedBalanceOf[owner] -= amount;
@@ -243,7 +243,7 @@ contract EncumberableToken is ERC20, IERC20Permit, IERC7246 {
         bytes32 r,
         bytes32 s
     ) external {
-        require(block.timestamp < expiry, "Signature expired");
+        require(block.timestamp < expiry, "ERC7246: signature expired");
         uint256 nonce = nonces[owner];
         bytes32 structHash = keccak256(abi.encode(AUTHORIZATION_TYPEHASH, owner, spender, amount, nonce, expiry));
         bytes32 digest = keccak256(abi.encodePacked("\x19\x01", DOMAIN_SEPARATOR(), structHash));
@@ -251,7 +251,7 @@ contract EncumberableToken is ERC20, IERC20Permit, IERC7246 {
             nonces[owner]++;
             _approve(owner, spender, amount);
         } else {
-            revert("Bad signatory");
+            revert("ERC7246: bad signatory");
         }
     }
 
@@ -274,7 +274,7 @@ contract EncumberableToken is ERC20, IERC20Permit, IERC7246 {
         bytes32 r,
         bytes32 s
     ) external {
-        require(block.timestamp < expiry, "Signature expired");
+        require(block.timestamp < expiry, "ERC7246: signature expired");
         uint256 nonce = nonces[owner];
         bytes32 structHash = keccak256(abi.encode(ENCUMBER_TYPEHASH, owner, taker, amount, nonce, expiry));
         bytes32 digest = keccak256(abi.encodePacked("\x19\x01", DOMAIN_SEPARATOR(), structHash));
@@ -282,7 +282,7 @@ contract EncumberableToken is ERC20, IERC20Permit, IERC7246 {
             nonces[owner]++;
             _encumber(owner, taker, amount);
         } else {
-            revert("Bad signatory");
+            revert("ERC7246: bad signatory");
         }
     }
 
@@ -308,14 +308,14 @@ contract EncumberableToken is ERC20, IERC20Permit, IERC7246 {
             (bool success, bytes memory data) = signer.staticcall(
                 abi.encodeWithSelector(EIP1271_MAGIC_VALUE, digest, signature)
             );
-            require(success == true, "Call to verify EIP1271 signature failed");
+            require(success == true, "ERC7246: call to verify EIP1271 signature failed");
             bytes4 returnValue = abi.decode(data, (bytes4));
             return returnValue == EIP1271_MAGIC_VALUE;
         } else {
             (address recoveredSigner, ECDSA.RecoverError recoverError) = ECDSA.tryRecover(digest, v, r, s);
-            require(recoverError != ECDSA.RecoverError.InvalidSignatureS, "Invalid value s");
-            require(recoverError != ECDSA.RecoverError.InvalidSignature, "Bad signatory");
-            require(recoveredSigner == signer, "Bad signatory");
+            require(recoverError != ECDSA.RecoverError.InvalidSignatureS, "ERC7246: invalid value s");
+            require(recoverError != ECDSA.RecoverError.InvalidSignature, "ERC7246: bad signatory");
+            require(recoveredSigner == signer, "ERC7246: bad signatory");
             return true;
         }
     }
@@ -358,10 +358,10 @@ contract EncumberableToken is ERC20, IERC20Permit, IERC7246 {
                     revert(0, 0)
                 }
         }
-        require(success, "Transfer in failed");
+        require(success, "ERC7246: transfer in failed");
 
         uint256 postTransferBalance = ERC20(asset).balanceOf(address(this));
-        require(postTransferBalance == preTransferBalance + amount, "ERC7246: Insufficient amount transferred in");
+        require(postTransferBalance == preTransferBalance + amount, "ERC7246: insufficient amount transferred in");
     }
 
     /**
@@ -388,6 +388,6 @@ contract EncumberableToken is ERC20, IERC20Permit, IERC7246 {
                     revert(0, 0)
                 }
         }
-        require(success, "Transfer out failed");
+        require(success, "ERC7246: transfer out failed");
     }
 }

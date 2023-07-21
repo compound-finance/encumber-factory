@@ -72,7 +72,7 @@ contract PermitTest is Test {
 
         // bob calls permit with the signature, but he manipulates the owner
         vm.prank(bob);
-        vm.expectRevert("Bad signatory");
+        vm.expectRevert("ERC7246: bad signatory");
         wrappedToken.permit(charlie, bob, allowance, expiry, v, r, s);
 
         // bob's allowance from alice is unchanged
@@ -94,7 +94,7 @@ contract PermitTest is Test {
 
         // bob calls permit with the signature, but he manipulates the spender
         vm.prank(bob);
-        vm.expectRevert("Bad signatory");
+        vm.expectRevert("ERC7246: bad signatory");
         wrappedToken.permit(alice, charlie, allowance, expiry, v, r, s);
 
         // bob's allowance from alice is unchanged
@@ -116,7 +116,7 @@ contract PermitTest is Test {
 
         // bob calls permit with the signature, but he manipulates the allowance
         vm.prank(bob);
-        vm.expectRevert("Bad signatory");
+        vm.expectRevert("ERC7246: bad signatory");
         wrappedToken.permit(alice, bob, allowance + 1 wei, expiry, v, r, s);
 
         // bob's allowance from alice is unchanged
@@ -138,7 +138,7 @@ contract PermitTest is Test {
 
         // bob calls permit with the signature, but he manipulates the expiry
         vm.prank(bob);
-        vm.expectRevert("Bad signatory");
+        vm.expectRevert("ERC7246: bad signatory");
         wrappedToken.permit(alice, bob, allowance, expiry + 1, v, r, s);
 
         // bob's allowance from alice is unchanged
@@ -162,7 +162,7 @@ contract PermitTest is Test {
 
         // bob calls permit with the signature with an invalid nonce
         vm.prank(bob);
-        vm.expectRevert("Bad signatory");
+        vm.expectRevert("ERC7246: bad signatory");
         wrappedToken.permit(alice, bob, allowance, expiry, v, r, s);
 
         // bob's allowance from alice is unchanged
@@ -199,7 +199,7 @@ contract PermitTest is Test {
 
         // bob tries to reuse the same signature twice
         vm.prank(bob);
-        vm.expectRevert("Bad signatory");
+        vm.expectRevert("ERC7246: bad signatory");
         wrappedToken.permit(alice, bob, allowance, expiry, v, r, s);
 
         // bob's allowance from alice is unchanged
@@ -224,7 +224,7 @@ contract PermitTest is Test {
 
         // bob calls permit with the signature after the expiry
         vm.prank(bob);
-        vm.expectRevert("Signature expired");
+        vm.expectRevert("ERC7246: signature expired");
         wrappedToken.permit(alice, bob, allowance, expiry, v, r, s);
 
         // bob's allowance from alice is unchanged
@@ -249,7 +249,7 @@ contract PermitTest is Test {
 
         // bob calls permit with the signature with invalid `s` value
         vm.prank(bob);
-        vm.expectRevert("Invalid value s");
+        vm.expectRevert("ERC7246: invalid value s");
         wrappedToken.permit(alice, bob, allowance, expiry, v, r, invalidS);
 
         // bob's allowance from alice is unchanged
@@ -294,7 +294,7 @@ contract PermitTest is Test {
 
         // bob calls permit with the signature, but he manipulates the owner
         vm.prank(bob);
-        vm.expectRevert("Bad signatory");
+        vm.expectRevert("ERC7246: bad signatory");
         wrappedToken.permit(charlie, bob, allowance, expiry, v, r, s);
 
         // bob's allowance from alice's contract is unchanged
@@ -316,7 +316,7 @@ contract PermitTest is Test {
 
         // bob calls permit with the signature, but he manipulates the spender
         vm.prank(bob);
-        vm.expectRevert("Bad signatory");
+        vm.expectRevert("ERC7246: bad signatory");
         wrappedToken.permit(aliceContract, charlie, allowance, expiry, v, r, s);
 
         // bob's allowance from alice's contract is unchanged
@@ -338,7 +338,7 @@ contract PermitTest is Test {
 
         // bob calls permit with the signature, but he manipulates the allowance
         vm.prank(bob);
-        vm.expectRevert("Bad signatory");
+        vm.expectRevert("ERC7246: bad signatory");
         wrappedToken.permit(aliceContract, bob, allowance + 1 wei, expiry, v, r, s);
 
         // bob's allowance from alice's contract is unchanged
@@ -360,7 +360,7 @@ contract PermitTest is Test {
 
         // bob calls permit with the signature, but he manipulates the expiry
         vm.prank(bob);
-        vm.expectRevert("Bad signatory");
+        vm.expectRevert("ERC7246: bad signatory");
         wrappedToken.permit(aliceContract, bob, allowance, expiry + 1, v, r, s);
 
         // bob's allowance from alice's contract is unchanged
@@ -384,7 +384,7 @@ contract PermitTest is Test {
 
         // bob calls permit with the signature with an invalid nonce
         vm.prank(bob);
-        vm.expectRevert("Bad signatory");
+        vm.expectRevert("ERC7246: bad signatory");
         wrappedToken.permit(aliceContract, bob, allowance, expiry, v, r, s);
 
         // bob's allowance from alice's contract is unchanged
@@ -421,7 +421,7 @@ contract PermitTest is Test {
 
         // bob tries to reuse the same signature twice
         vm.prank(bob);
-        vm.expectRevert("Bad signatory");
+        vm.expectRevert("ERC7246: bad signatory");
         wrappedToken.permit(aliceContract, bob, allowance, expiry, v, r, s);
 
         // bob's allowance from alice's contract is unchanged
@@ -446,7 +446,7 @@ contract PermitTest is Test {
 
         // bob calls permit with the signature after the expiry
         vm.prank(bob);
-        vm.expectRevert("Signature expired");
+        vm.expectRevert("ERC7246: signature expired");
         wrappedToken.permit(aliceContract, bob, allowance, expiry, v, r, s);
 
         // bob's allowance from alice's contract is unchanged
@@ -469,7 +469,7 @@ contract PermitTest is Test {
 
         // bob calls permit with the signature with invalid `v` value
         vm.prank(bob);
-        vm.expectRevert("Call to verify EIP1271 signature failed");
+        vm.expectRevert("ERC7246: call to verify EIP1271 signature failed");
         wrappedToken.permit(aliceContract, bob, allowance, expiry, invalidV, r, s);
 
         // bob's allowance from alice's contract is unchanged
@@ -494,7 +494,7 @@ contract PermitTest is Test {
 
         // bob calls permit with the signature with invalid `s` value
         vm.prank(bob);
-        vm.expectRevert("Call to verify EIP1271 signature failed");
+        vm.expectRevert("ERC7246: call to verify EIP1271 signature failed");
         wrappedToken.permit(aliceContract, bob, allowance, expiry, v, r, invalidS);
 
         // bob's allowance from alice's contract is unchanged
