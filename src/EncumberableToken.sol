@@ -243,7 +243,7 @@ contract EncumberableToken is ERC20, IERC20Permit, IERC7246 {
         bytes32 r,
         bytes32 s
     ) external {
-        require(block.timestamp < expiry, "ERC7246: signature expired");
+        require(block.timestamp < expiry, "Signature expired");
         uint256 nonce = nonces[owner];
         bytes32 structHash = keccak256(abi.encode(AUTHORIZATION_TYPEHASH, owner, spender, amount, nonce, expiry));
         bytes32 digest = keccak256(abi.encodePacked("\x19\x01", DOMAIN_SEPARATOR(), structHash));
@@ -251,7 +251,7 @@ contract EncumberableToken is ERC20, IERC20Permit, IERC7246 {
             nonces[owner]++;
             _approve(owner, spender, amount);
         } else {
-            revert("ERC7246: bad signatory");
+            revert("Bad signatory");
         }
     }
 
@@ -274,7 +274,7 @@ contract EncumberableToken is ERC20, IERC20Permit, IERC7246 {
         bytes32 r,
         bytes32 s
     ) external {
-        require(block.timestamp < expiry, "ERC7246: signature expired");
+        require(block.timestamp < expiry, "Signature expired");
         uint256 nonce = nonces[owner];
         bytes32 structHash = keccak256(abi.encode(ENCUMBER_TYPEHASH, owner, taker, amount, nonce, expiry));
         bytes32 digest = keccak256(abi.encodePacked("\x19\x01", DOMAIN_SEPARATOR(), structHash));
@@ -282,7 +282,7 @@ contract EncumberableToken is ERC20, IERC20Permit, IERC7246 {
             nonces[owner]++;
             _encumber(owner, taker, amount);
         } else {
-            revert("ERC7246: bad signatory");
+            revert("Bad signatory");
         }
     }
 
@@ -308,14 +308,14 @@ contract EncumberableToken is ERC20, IERC20Permit, IERC7246 {
             (bool success, bytes memory data) = signer.staticcall(
                 abi.encodeWithSelector(EIP1271_MAGIC_VALUE, digest, signature)
             );
-            require(success == true, "ERC7246: call to verify EIP1271 signature failed");
+            require(success == true, "Call to verify EIP1271 signature failed");
             bytes4 returnValue = abi.decode(data, (bytes4));
             return returnValue == EIP1271_MAGIC_VALUE;
         } else {
             (address recoveredSigner, ECDSA.RecoverError recoverError) = ECDSA.tryRecover(digest, v, r, s);
-            require(recoverError != ECDSA.RecoverError.InvalidSignatureS, "ERC7246: invalid value s");
-            require(recoverError != ECDSA.RecoverError.InvalidSignature, "ERC7246: bad signatory");
-            require(recoveredSigner == signer, "ERC7246: bad signatory");
+            require(recoverError != ECDSA.RecoverError.InvalidSignatureS, "Invalid value s");
+            require(recoverError != ECDSA.RecoverError.InvalidSignature, "Bad signatory");
+            require(recoveredSigner == signer, "Bad signatory");
             return true;
         }
     }
