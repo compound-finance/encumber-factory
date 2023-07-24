@@ -183,9 +183,7 @@ contract EncumberableToken is ERC20, IERC20Permit, IERC7246 {
      * @dev Reduce `owner`'s encumbrance to `taker` by `amount`
      */
     function _release(address owner, address taker, uint256 amount) private {
-        if (encumbrances[owner][taker] < amount) {
-          amount = encumbrances[owner][taker];
-        }
+        require(encumbrances[owner][taker] >= amount, "ERC7246: insufficient encumbrance");
         encumbrances[owner][taker] -= amount;
         encumberedBalanceOf[owner] -= amount;
         emit Release(owner, taker, amount);

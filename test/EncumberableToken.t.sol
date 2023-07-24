@@ -270,7 +270,7 @@ contract EncumberableTokenTest is Test {
 
         vm.prank(alice);
 
-        // alice encumbers some of her balance to bob
+        // alice encumbers her balance to bob
         wrappedToken.encumber(bob, 100e18);
 
         assertEq(wrappedToken.balanceOf(alice), 100e18);
@@ -289,6 +289,30 @@ contract EncumberableTokenTest is Test {
         assertEq(wrappedToken.availableBalanceOf(alice), 40e18);
         assertEq(wrappedToken.encumberedBalanceOf(alice), 60e18);
         assertEq(wrappedToken.encumbrances(alice, bob), 60e18);
+    }
+
+    function testReleaseInsufficientEncumbrance() public {
+        deal(address(wrappedToken), alice, 100e18);
+
+        vm.prank(alice);
+
+        // alice encumbers her balance to bob
+        wrappedToken.encumber(bob, 100e18);
+
+        assertEq(wrappedToken.balanceOf(alice), 100e18);
+        assertEq(wrappedToken.availableBalanceOf(alice), 0);
+        assertEq(wrappedToken.encumberedBalanceOf(alice), 100e18);
+        assertEq(wrappedToken.encumbrances(alice, bob), 100e18);
+
+        // bob releases a greater amount than is encumbered to him
+        vm.prank(bob);
+        vm.expectRevert("ERC7246: insufficient encumbrance");
+        wrappedToken.release(alice, 200e18);
+
+        assertEq(wrappedToken.balanceOf(alice), 100e18);
+        assertEq(wrappedToken.availableBalanceOf(alice), 0);
+        assertEq(wrappedToken.encumberedBalanceOf(alice), 100e18);
+        assertEq(wrappedToken.encumbrances(alice, bob), 100e18);
     }
 
     function testWrap() public {
