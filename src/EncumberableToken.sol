@@ -110,7 +110,7 @@ contract EncumberableToken is ERC20, IERC20Permit, IERC7246 {
             // We are now moving only "available" tokens and must check
             // to not unfairly move tokens encumbered to others
 
-           require(availableBalanceOf(src) >= excessAmount, "ERC7246: insufficient balance");
+           require(availableBalanceOf(src) >= excessAmount, "ERC7246: insufficient available balance");
 
             _spendAllowance(src, msg.sender, excessAmount);
         } else {
