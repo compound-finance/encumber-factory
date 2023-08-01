@@ -125,11 +125,11 @@ contract EncumberableToken is ERC20, IERC20Permit, IERC7246 {
      * @dev Spend `amount` of `owner`'s encumbrance to `taker`
      */
     function _spendEncumbrance(address owner, address taker, uint256 amount) internal {
-        uint256 currentEncumbrance = encumbrances[owner][taker];
-        require(currentEncumbrance >= amount, "ERC7246: insufficient encumbrance");
-        uint256 newEncumbrance = currentEncumbrance - amount;
-        encumbrances[owner][taker] = newEncumbrance;
+        uint256 previousEncumbrance = encumbrances[owner][taker];
+        require(previousEncumbrance >= amount, "ERC7246: insufficient encumbrance");
+        encumbrances[owner][taker] -= amount;
         encumberedBalanceOf[owner] -= amount;
+        emit EncumbranceUpdate(owner, taker, previousEncumbrance, previousEncumbrance - amount);
     }
 
     /**
@@ -147,9 +147,10 @@ contract EncumberableToken is ERC20, IERC20Permit, IERC7246 {
      */
     function _encumber(address owner, address taker, uint256 amount) private {
         require(availableBalanceOf(owner) >= amount, "ERC7246: insufficient available balance");
+        uint256 previousEncumbrance = encumbrances[owner][taker];
         encumbrances[owner][taker] += amount;
         encumberedBalanceOf[owner] += amount;
-        emit Encumber(owner, taker, amount);
+        emit EncumbranceUpdate(owner, taker, previousEncumbrance, previousEncumbrance + amount);
     }
 
     /**
@@ -183,10 +184,11 @@ contract EncumberableToken is ERC20, IERC20Permit, IERC7246 {
      * @dev Reduce `owner`'s encumbrance to `taker` by `amount`
      */
     function _release(address owner, address taker, uint256 amount) private {
-        require(encumbrances[owner][taker] >= amount, "ERC7246: insufficient encumbrance");
+        uint256 previousEncumbrance = encumbrances[owner][taker];
+        require(previousEncumbrance >= amount, "ERC7246: insufficient encumbrance");
         encumbrances[owner][taker] -= amount;
         encumberedBalanceOf[owner] -= amount;
-        emit Release(owner, taker, amount);
+        emit EncumbranceUpdate(owner, taker, previousEncumbrance, previousEncumbrance - amount);
     }
 
     /**

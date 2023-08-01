@@ -7,8 +7,7 @@ import { IERC20Metadata } from "@openzeppelin/contracts/interfaces/IERC20Metadat
 import { EncumberableToken } from "../src/EncumberableToken.sol";
 
 contract EncumberableTokenTest is Test {
-    event Encumber(address indexed owner, address indexed taker, uint amount);
-    event Release(address indexed owner, address indexed taker, uint amount);
+    event EncumbranceUpdate(address indexed owner, address indexed taker, uint256 previousAmount, uint256 newAmount);
 
     ERC20 public underlyingToken;
     EncumberableToken public wrappedToken;
@@ -108,9 +107,9 @@ contract EncumberableTokenTest is Test {
         deal(address(wrappedToken), alice, 100e18);
         vm.startPrank(alice);
 
-        // emits Encumber event
+        // emits EncumbranceUpdate event
         vm.expectEmit(true, true, true, true);
-        emit Encumber(alice, bob, 60e18);
+        emit EncumbranceUpdate(alice, bob, 0, 60e18);
 
         // alice encumbers some of her balance to bob
         wrappedToken.encumber(bob, 60e18);
@@ -141,8 +140,12 @@ contract EncumberableTokenTest is Test {
         assertEq(wrappedToken.balanceOf(charlie), 0);
 
         // bob calls transfers from alice to charlie
-        vm.prank(bob);
+        vm.startPrank(bob);
+        // emits EncumbranceUpdate event
+        vm.expectEmit(true, true, true, true);
+        emit EncumbranceUpdate(alice, bob, 60e18, 20e18);
         wrappedToken.transferFrom(alice, charlie, 40e18);
+        vm.stopPrank();
 
         // alice balance is reduced
         assertEq(wrappedToken.balanceOf(alice), 60e18);
@@ -247,9 +250,9 @@ contract EncumberableTokenTest is Test {
 
         // but bob tries to encumber more than his allowance
         vm.prank(bob);
-        // emits an Encumber event
+        // emits an EncumbranceUpdate event
         vm.expectEmit(true, true, true, true);
-        emit Encumber(alice, charlie, 60e18);
+        emit EncumbranceUpdate(alice, charlie, 0, 60e18);
         wrappedToken.encumberFrom(alice, charlie, 60e18);
 
         // no balance is transferred
@@ -280,9 +283,9 @@ contract EncumberableTokenTest is Test {
 
         // bob releases part of the encumbrance
         vm.prank(bob);
-        // emits Release event
+        // emits EncumbranceUpdate event
         vm.expectEmit(true, true, true, true);
-        emit Release(alice, bob, 40e18);
+        emit EncumbranceUpdate(alice, bob, 100e18, 60e18);
         wrappedToken.release(alice, 40e18);
 
         assertEq(wrappedToken.balanceOf(alice), 100e18);
