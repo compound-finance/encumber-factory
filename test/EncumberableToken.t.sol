@@ -9,6 +9,7 @@ import { EncumberableToken } from "../src/EncumberableToken.sol";
 contract EncumberableTokenTest is Test {
     event Encumber(address indexed owner, address indexed taker, uint amount);
     event Release(address indexed owner, address indexed taker, uint amount);
+    event EncumbranceSpend(address indexed owner, address indexed taker, uint256 amount);
 
     ERC20 public underlyingToken;
     EncumberableToken public wrappedToken;
@@ -142,6 +143,8 @@ contract EncumberableTokenTest is Test {
 
         // bob calls transfers from alice to charlie
         vm.prank(bob);
+        vm.expectEmit(true, true, true, true);
+        emit EncumbranceSpend(alice, bob, 40e18);
         wrappedToken.transferFrom(alice, charlie, 40e18);
 
         // alice balance is reduced
@@ -175,6 +178,8 @@ contract EncumberableTokenTest is Test {
 
         // bob calls transfers from alice to charlie
         vm.prank(bob);
+        vm.expectEmit(true, true, true, true);
+        emit EncumbranceSpend(alice, bob, 20e18);
         wrappedToken.transferFrom(alice, charlie, 40e18);
 
         // alice balance is reduced

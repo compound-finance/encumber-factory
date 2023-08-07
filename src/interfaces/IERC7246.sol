@@ -12,10 +12,16 @@ interface IERC7246 {
     event Encumber(address indexed owner, address indexed taker, uint256 amount);
 
     /**
-     * @dev Emitted when the encumbrance of a `taker` to an `owner` is reduced
+     * @dev Emitted when the encumbrance of an `owner` to a `taker` is reduced
      * by `amount`.
      */
     event Release(address indexed owner, address indexed taker, uint256 amount);
+
+    /**
+     * @dev Emitted when `amount` of encumbrance of an `owner` to a `taker` is
+     * spent.
+     */
+    event EncumbranceSpend(address indexed owner, address indexed taker, uint256 amount);
 
     /**
      * @dev Returns the total amount of tokens owned by `owner` that are

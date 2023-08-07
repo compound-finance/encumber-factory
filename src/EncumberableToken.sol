@@ -130,6 +130,7 @@ contract EncumberableToken is ERC20, IERC20Permit, IERC7246 {
         uint256 newEncumbrance = currentEncumbrance - amount;
         encumbrances[owner][taker] = newEncumbrance;
         encumberedBalanceOf[owner] -= amount;
+        emit EncumbranceSpend(owner, taker, amount);
     }
 
     /**
