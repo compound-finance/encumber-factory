@@ -142,6 +142,8 @@ contract EncumberableTokenTest is Test {
 
         // bob calls transfers from alice to charlie
         vm.prank(bob);
+        vm.expectEmit(true, true, true, true);
+        emit Release(alice, bob, 40e18);
         wrappedToken.transferFrom(alice, charlie, 40e18);
 
         // alice balance is reduced
@@ -175,6 +177,8 @@ contract EncumberableTokenTest is Test {
 
         // bob calls transfers from alice to charlie
         vm.prank(bob);
+        vm.expectEmit(true, true, true, true);
+        emit Release(alice, bob, 20e18);
         wrappedToken.transferFrom(alice, charlie, 40e18);
 
         // alice balance is reduced

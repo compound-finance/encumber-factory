@@ -12,7 +12,7 @@ interface IERC7246 {
     event Encumber(address indexed owner, address indexed taker, uint256 amount);
 
     /**
-     * @dev Emitted when the encumbrance of a `taker` to an `owner` is reduced
+     * @dev Emitted when the encumbrance of an `owner` to a `taker` is reduced
      * by `amount`.
      */
     event Release(address indexed owner, address indexed taker, uint256 amount);

@@ -104,7 +104,7 @@ contract EncumberableToken is ERC20, IERC20Permit, IERC7246 {
         if (amount > encumberedToTaker)  {
             uint256 excessAmount = amount - encumberedToTaker;
             // Exceeds Encumbrance, so spend all of it
-            _spendEncumbrance(src, msg.sender, encumberedToTaker);
+            _releaseEncumbrance(src, msg.sender, encumberedToTaker);
 
             // Having spent all the tokens encumbered to the mover,
             // We are now moving only "available" tokens and must check
@@ -114,22 +114,11 @@ contract EncumberableToken is ERC20, IERC20Permit, IERC7246 {
 
             _spendAllowance(src, msg.sender, excessAmount);
         } else {
-            _spendEncumbrance(src, msg.sender, amount);
+            _releaseEncumbrance(src, msg.sender, amount);
         }
 
         _transfer(src, dst, amount);
         return true;
-    }
-
-    /**
-     * @dev Spend `amount` of `owner`'s encumbrance to `taker`
-     */
-    function _spendEncumbrance(address owner, address taker, uint256 amount) internal {
-        uint256 currentEncumbrance = encumbrances[owner][taker];
-        require(currentEncumbrance >= amount, "ERC7246: insufficient encumbrance");
-        uint256 newEncumbrance = currentEncumbrance - amount;
-        encumbrances[owner][taker] = newEncumbrance;
-        encumberedBalanceOf[owner] -= amount;
     }
 
     /**
@@ -176,13 +165,13 @@ contract EncumberableToken is ERC20, IERC20Permit, IERC7246 {
      * @param amount Amount of tokens to decrease the encumbrance by
      */
     function release(address owner, uint256 amount) external {
-        _release(owner, msg.sender, amount);
+        _releaseEncumbrance(owner, msg.sender, amount);
     }
 
     /**
      * @dev Reduce `owner`'s encumbrance to `taker` by `amount`
      */
-    function _release(address owner, address taker, uint256 amount) private {
+    function _releaseEncumbrance(address owner, address taker, uint256 amount) private {
         require(encumbrances[owner][taker] >= amount, "ERC7246: insufficient encumbrance");
         encumbrances[owner][taker] -= amount;
         encumberedBalanceOf[owner] -= amount;
