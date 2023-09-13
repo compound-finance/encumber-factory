@@ -196,6 +196,35 @@ contract EncumberableTokenTest is Test {
         assertEq(wrappedToken.balanceOf(charlie), 40e18);
     }
 
+    function testTransferFromRevertsIfYouSpendEncumberedTokens() public {
+        deal(address(wrappedToken), alice, 200e18);
+        vm.startPrank(alice);
+
+        // alice encumbers some of her balance to bob
+        wrappedToken.encumber(bob, 50e18);
+
+        // she also grants him an approval
+        wrappedToken.approve(bob, type(uint256).max);
+
+        // alice encumbers the remainder of her balance to charlie
+        wrappedToken.encumber(charlie, 150e18);
+
+        vm.stopPrank();
+
+        assertEq(wrappedToken.balanceOf(alice), 200e18);
+        assertEq(wrappedToken.availableBalanceOf(alice), 0);
+        assertEq(wrappedToken.encumberedBalanceOf(alice), 200e18);
+        assertEq(wrappedToken.encumbrances(alice, bob), 50e18);
+        assertEq(wrappedToken.encumbrances(alice, charlie), 150e18);
+        assertEq(wrappedToken.allowance(alice, bob), type(uint256).max);
+
+        // bob calls transfers from alice, attempting to transfer his encumbered
+        // tokens and also transfer tokens encumbered to charlie
+        vm.prank(bob);
+        vm.expectRevert("ERC7246: insufficient available balance");
+        wrappedToken.transferFrom(alice, bob, 100e18);
+    }
+
     function testTransferFromInsufficientAllowance() public {
         deal(address(wrappedToken), alice, 100e18);
 
