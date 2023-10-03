@@ -196,7 +196,7 @@ contract EncumberableTokenTest is Test {
         assertEq(wrappedToken.balanceOf(charlie), 40e18);
     }
 
-    function testTransferFromRevertsIfYouSpendEncumberedTokens() public {
+    function testTransferFromRevertsIfSpendingTokensEncumberedToOthers() public {
         deal(address(wrappedToken), alice, 200e18);
         vm.startPrank(alice);
 
