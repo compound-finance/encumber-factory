@@ -103,14 +103,15 @@ contract EncumberableToken is ERC20, IERC20Permit, IERC7246 {
         uint256 encumberedToTaker = encumbrances[src][msg.sender];
         if (amount > encumberedToTaker)  {
             uint256 excessAmount = amount - encumberedToTaker;
+
+            // WARNING: this check needs to happen BEFORE _releaseEncumbrance,
+            // otherwise the released encumbrance will increase
+            // availableBalanceOf(src), allowing dst to transfer tokens that
+            // are encumbered to someone else
+            require(availableBalanceOf(src) >= excessAmount, "ERC7246: insufficient available balance");
+
             // Exceeds Encumbrance, so spend all of it
             _releaseEncumbrance(src, msg.sender, encumberedToTaker);
-
-            // Having spent all the tokens encumbered to the mover,
-            // We are now moving only "available" tokens and must check
-            // to not unfairly move tokens encumbered to others
-
-           require(availableBalanceOf(src) >= excessAmount, "ERC7246: insufficient available balance");
 
             _spendAllowance(src, msg.sender, excessAmount);
         } else {
