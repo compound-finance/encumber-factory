@@ -278,7 +278,7 @@ contract EncumberableTokenTest is Test {
         assertEq(wrappedToken.allowance(alice, bob), 100e18);
         assertEq(wrappedToken.balanceOf(charlie), 0);
 
-        // but bob tries to encumber more than his allowance
+        // bob encumbers part of his allowance from alice to charlie
         vm.prank(bob);
         // emits an Encumber event
         vm.expectEmit(true, true, true, true);
